@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTBroker.AppCore", "MQTTB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTBroker.AppCore.Tests", "MQTTBroker.AppCore.Tests\MQTTBroker.AppCore.Tests.csproj", "{61901048-F333-48C2-A824-866BE28C0684}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTBroker.Broker", "MQTTBroker.Broker\MQTTBroker.Broker.csproj", "{8B3980D3-2A52-4E2B-AE00-481CCEB1B643}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,10 +25,6 @@ Global
 		{61901048-F333-48C2-A824-866BE28C0684}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61901048-F333-48C2-A824-866BE28C0684}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61901048-F333-48C2-A824-866BE28C0684}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8B3980D3-2A52-4E2B-AE00-481CCEB1B643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8B3980D3-2A52-4E2B-AE00-481CCEB1B643}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8B3980D3-2A52-4E2B-AE00-481CCEB1B643}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8B3980D3-2A52-4E2B-AE00-481CCEB1B643}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,7 +32,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{36C24850-9E9A-482B-AC20-5DC22F1A6347} = {16D97F69-2EAA-4356-8A21-53B21ADC4140}
 		{61901048-F333-48C2-A824-866BE28C0684} = {D4ECC110-0B17-4E80-859E-632B669CC6CD}
-		{8B3980D3-2A52-4E2B-AE00-481CCEB1B643} = {16D97F69-2EAA-4356-8A21-53B21ADC4140}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D213F951-6FE4-4E45-9C08-42F8F24C9AAA}
