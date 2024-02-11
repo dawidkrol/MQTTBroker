@@ -5,12 +5,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-public class TcpClientManager
+public class TcpConnection
 {
     private TcpClient _client;
     private NetworkStream _stream;
 
-    public TcpClientManager(TcpClient client)
+    public TcpConnection(TcpClient client)
     {
         _client = client;
         _stream = _client.GetStream();

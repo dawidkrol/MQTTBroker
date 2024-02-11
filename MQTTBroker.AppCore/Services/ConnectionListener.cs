@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using MQTTBroker.AppCore.Models;
 using MQTTBroker.AppCore.Services.Interface;
 
 namespace MQTTBroker.AppCore.Services;
@@ -25,7 +24,7 @@ public class ConnectionListener
         return _listener.AcceptTcpClient();
     }
 
-    public void StartListening(IBroker broker, Action<SubscriberModel> addNewClient, Action<SubscriberModel> removeClient)
+    public void StartListening(IBroker broker)
     {
         _listener.Start();
         while (_shouldListen)

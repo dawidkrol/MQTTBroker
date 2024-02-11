@@ -1,4 +1,4 @@
-﻿using MQTTBroker.AppCore.Models;
+﻿using MQTTBroker.AppCore.Commands;
 using MQTTBroker.AppCore.Services.Interface;
 
 namespace MQTTBroker.AppCore.Services;
@@ -7,7 +7,7 @@ public class Broker : IBroker
 {
     private readonly ConnectionListener _connectionListener;
     private readonly TopicManager _topicManager;
-    private readonly TcpClientManager _tcpClientManager;
+    private readonly ClientManager _clientManager;
 
     public Broker(string host, int port)
     {
@@ -16,20 +16,18 @@ public class Broker : IBroker
 
     public void Start()
     {
-        _connectionListener.StartListening(this, AddNewClient, RemoveClient);
+        _connectionListener.StartListening(this);
     }
 
-    private void RemoveClient(SubscriberModel client)
+    public void ExecuteCommand(ICommand command)
     {
+        switch (command)
+        {
+            case ConnectCommand connectCommand:
+                _clientManager.AddTcpConnection(connectCommand.Client);
+                break;
+            default:
+                throw new NotImplementedException();
+        }
     }
-
-    private void AddNewClient(SubscriberModel client)
-    {
-    }
-
-    public void NewSubscribtion() { }
-
-    public void RemoveSubscription() { }
-
-    public void Publish() { }
 }
