@@ -6,43 +6,53 @@ namespace MQTTBroker.AppCore.Services;
 
 public class TopicManager : ICrudTopicService, ISubscribeOperationsService, IMessageSender
 {
-    private List<TopicModel> Topics { get; set; } = new List<TopicModel>();
+    private List<Topic> Topics { get; set; } = new List<Topic>();
 
-    public void AddTopic(TopicModel topicModel)
+    public Topic? GetTopic(string topicName)
     {
-        Topics.Add(topicModel);
+        return Topics.SingleOrDefault(x => x.Name == topicName);
     }
 
-    public void RemoveTopic(int topicId)
+    public void SubscribeTopic(string topicName, TcpConnection subscriber)
     {
-        var itemToRemove = Topics.SingleOrDefault(x => x.Id == topicId) ?? throw new NotFoundException($"Cannot find topic witch id = {topicId}");
-        Topics.Remove(itemToRemove);
-    }
-
-    public TopicModel GetTopic(int topicId)
-    {
-        return Topics.SingleOrDefault(x => x.Id == topicId) ?? throw new NotFoundException($"Cannot find topic witch id = {topicId}");
-    }
-
-    public void SubscribeTopic(int topicId, SubscriberModel subscriber)
-    {
-        var topicToSubscribe = Topics.SingleOrDefault(x => x.Id == topicId) ?? throw new NotFoundException($"Cannot find topic witch id = {topicId}");
+        var topicToSubscribe = Topics.SingleOrDefault(x => x.Name == topicName);
+        if (topicToSubscribe == null)
+        {
+            topicToSubscribe = new Topic
+            {
+                Name = topicName,
+                Subscribers = new List<TcpConnection>()
+            };
+            Topics.Add(topicToSubscribe);
+        }
         topicToSubscribe.Subscribers.Add(subscriber);
     }
 
-    public void UnsubscribeTopic(int topicId, Guid subscriberId)
+    public void UnsubscribeTopic(string name, TcpConnection tcpConnection)
     {
-        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Id == topicId) ?? throw new NotFoundException($"Cannot find topic witch id = {topicId}");
-        var subscriber = topicToUnsubscribe.Subscribers.SingleOrDefault(x => x.Id == subscriberId) ?? throw new NotFoundException($"Cannot find subscriber witch id = {subscriberId} in topic witch id = {topicId}");
-        topicToUnsubscribe.Subscribers.Remove(subscriber);
+        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Name == name) ?? throw new NotFoundException($"Cannot find topic witch name = {name}");
+        topicToUnsubscribe.Subscribers.Remove(tcpConnection);
+        
+        if (topicToUnsubscribe.Subscribers.Count == 0)
+        {
+            Topics.Remove(topicToUnsubscribe);
+        }
+    }
+    
+    public void RemoveTcpConnection(TcpConnection tcpConnection)
+    {
+        foreach (var topic in Topics)
+        {
+            UnsubscribeTopic(topic.Name, tcpConnection);
+        }
     }
 
-    public void SendMessageToSubscribers(int topicId, string message)
+    public void PublishMessage(string topicName, string message)
     {
-        var topic = Topics.SingleOrDefault(x => x.Id == topicId) ?? throw new NotFoundException($"Cannot find topic witch id = {topicId}");
+        var topic = Topics.SingleOrDefault(x => x.Name == topicName) ?? throw new NotFoundException($"Cannot find topic witch name = {topicName}");
         foreach (var subscriber in topic.Subscribers)
         {
-            // TODO: Sending messages
+            subscriber.SendMessageAsync(message);
         }
     }
 }

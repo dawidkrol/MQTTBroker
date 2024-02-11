@@ -9,6 +9,7 @@ public class TcpConnection
 {
     private TcpClient _client;
     private NetworkStream _stream;
+    // private Queue<string> _messageQueue = new Queue<string>();
 
     public TcpConnection(TcpClient client)
     {
@@ -34,6 +35,7 @@ public class TcpConnection
 
     public async Task SendMessageAsync(string message)
     {
+        // if (_messageQueue.TryDequeue(out string message))
         try
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
@@ -72,6 +74,7 @@ public class TcpConnection
         byte[] buffer = new byte[1024];
         while (_client.Connected)
         {
+            // SendMessageAsync();
             int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
             if (bytesRead == 0)
             {

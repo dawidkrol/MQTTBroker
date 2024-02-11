@@ -2,5 +2,5 @@
 
 internal interface IMessageSender
 {
-    public void SendMessageToSubscribers(int topicId, string message);
+    void PublishMessage(string topicName, string message);
 }

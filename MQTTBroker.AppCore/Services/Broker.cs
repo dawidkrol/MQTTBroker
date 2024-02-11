@@ -26,6 +26,18 @@ public class Broker : IBroker
             case ConnectCommand connectCommand:
                 _clientManager.AddTcpConnection(connectCommand.Client);
                 break;
+            case DisconnectCommand disconnectCommand:
+                _topicManager.RemoveTcpConnection(disconnectCommand.TcpConnection);
+                break;
+            case SubscribeCommand subscribeCommand:
+                _topicManager.SubscribeTopic(subscribeCommand.TopicName, subscribeCommand.TcpConnection);
+                break;
+            case UnsubscribeCommand unsubscribeCommand:
+                _topicManager.UnsubscribeTopic(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
+                break;
+            case PublishCommand publishCommand:
+                _topicManager.PublishMessage(publishCommand.TopicName, publishCommand.Message);
+                break;
             default:
                 throw new NotImplementedException();
         }
