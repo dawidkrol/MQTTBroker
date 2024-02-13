@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 public class TcpConnection
 {
+    public bool IsConnectionEstablished { get; set; }
     private TcpClient _client;
     private NetworkStream _stream;
     // private Queue<string> _messageQueue = new Queue<string>();

@@ -5,7 +5,7 @@ namespace MQTTBroker.AppCore.Commands;
 public class ConnectCommand : ICommand
 {
     private readonly byte[] _data;
-    private readonly TcpConnection _tcpConnection;
+    public TcpConnection TcpConnection { get; }
     
     private const string ProtocolName = "MQIsdp";
     private const ushort ProtocolVersionNumber = 3;
@@ -14,6 +14,6 @@ public class ConnectCommand : ICommand
     public ConnectCommand(byte[] data, TcpConnection tcpConnection)
     {
         _data = data;
-        _tcpConnection = tcpConnection;
+        TcpConnection = tcpConnection;
     }
 }

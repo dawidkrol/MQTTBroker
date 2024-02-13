@@ -8,6 +8,13 @@ public class ClientManager
     
     public void AddTcpConnection(TcpClient client)
     {
-        _connections.Add(new TcpConnection(client));
+        var tcpConnection = new TcpConnection(client);
+        _connections.Add(tcpConnection);
+        tcpConnection.StartAsync();
+    }
+    
+    public void ChangeConnectionStatus(TcpConnection connection, bool status)
+    {
+        connection.IsConnectionEstablished = status;
     }
 }

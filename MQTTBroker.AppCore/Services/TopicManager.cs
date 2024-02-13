@@ -6,7 +6,7 @@ namespace MQTTBroker.AppCore.Services;
 
 public class TopicManager : ICrudTopicService, ISubscribeOperationsService, IMessageSender
 {
-    private List<Topic> Topics { get; set; } = new List<Topic>();
+    private List<Topic> Topics { get; set; } = new();
 
     public Topic? GetTopic(string topicName)
     {

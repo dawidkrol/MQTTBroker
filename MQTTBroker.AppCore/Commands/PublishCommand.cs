@@ -5,7 +5,7 @@ namespace MQTTBroker.AppCore.Commands;
 public class PublishCommand : ICommand
 {
     private readonly byte[] _data;
-    private readonly TcpConnection _tcpConnection;
+    public TcpConnection TcpConnection { get; }
     
     public string TopicName { get; set; }
     public string MessageId { get; set; }
@@ -14,7 +14,7 @@ public class PublishCommand : ICommand
     public PublishCommand(byte[] data, TcpConnection tcpConnection)
     {
         _data = data;
-        _tcpConnection = tcpConnection;
+        TcpConnection = tcpConnection;
         ExtractData();
     }
     

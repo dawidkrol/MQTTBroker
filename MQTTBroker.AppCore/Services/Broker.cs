@@ -11,7 +11,7 @@ public class Broker : IBroker
 
     public Broker(string host, int port)
     {
-        _connectionListener = new ConnectionListener(host, port);
+        _connectionListener = new ConnectionListener(host, port, this);
     }
 
     public void Start()
@@ -23,8 +23,11 @@ public class Broker : IBroker
     {
         switch (command)
         {
+            case CreateTcpConnectionCommand createTcpConnectionCommand:
+                _clientManager.AddTcpConnection(createTcpConnectionCommand.TcpClient);
+                break;
             case ConnectCommand connectCommand:
-                _clientManager.AddTcpConnection(connectCommand.Client);
+                _clientManager.ChangeConnectionStatus(connectCommand.TcpConnection, true);
                 break;
             case DisconnectCommand disconnectCommand:
                 _topicManager.RemoveTcpConnection(disconnectCommand.TcpConnection);
@@ -36,7 +39,7 @@ public class Broker : IBroker
                 _topicManager.UnsubscribeTopic(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
                 break;
             case PublishCommand publishCommand:
-                _topicManager.PublishMessage(publishCommand.TopicName, publishCommand.Message);
+                _topicManager.PublishMessage(publishCommand.TopicName, publishCommand.Payload);
                 break;
             default:
                 throw new NotImplementedException();
