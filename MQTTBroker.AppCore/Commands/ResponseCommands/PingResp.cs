@@ -4,11 +4,11 @@ public class PingResp
 {
     public byte[] ToBuffer()
     {
-        byte[] buffer =
-        [
-            Convert.ToByte("11010000", 2), // PINGRESP message type
-            Convert.ToByte("00000000", 2), // Remaining length
-        ];
-        return buffer;
+        var builder = CommandBuilder
+                            .TotalLenghOfCommand(2)
+                                .AddCommandType(Enums.MessageType.PingResp)
+                                .AddEmptyLine();
+                                
+        return builder.Build();
     }
 }

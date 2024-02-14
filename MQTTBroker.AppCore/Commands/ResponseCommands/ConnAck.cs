@@ -13,13 +13,14 @@ public class ConnAck : ICommand
 
     public byte[] ToBuffer()
     {
-        byte[] buffer =
-        [
-            Convert.ToByte("00100000", 2), // CONNACK message type
-            Convert.ToByte("00000010", 2), // Remaining length
-            Convert.ToByte("00000000", 2), // Reserved values. Not used.
-            (byte)ReturnCode, // Connect return code
-        ];
-        return buffer;
+
+        var builder = CommandBuilder
+                            .TotalLenghOfCommand(4)
+                                .AddCommandType(MessageType.ConnAck)
+                                .AddData(2)
+                                .AddEmptyLine()
+                                .AddConnectReturnCode(ReturnCode);
+                                
+        return builder.Build();
     }
 }

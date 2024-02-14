@@ -11,13 +11,12 @@ public class UnsubAck
 
     public byte[] ToBuffer()
     {
-        byte[] buffer =
-        [
-            Convert.ToByte("10110000", 2), // UNSUBACK message type
-            Convert.ToByte("00000010", 2), // Remaining length
-            (byte)(MessageId >> 8), // Message ID MSB
-            (byte)(MessageId & 0xFF), // Message ID LSB
-        ];
-        return buffer;
+        var builder = CommandBuilder
+                        .TotalLenghOfCommand(4)
+                            .AddCommandType(Enums.MessageType.UnsubAck)
+                            .AddData(2)
+                            .AddMessageId(MessageId);
+
+        return builder.Build();
     }
 }
