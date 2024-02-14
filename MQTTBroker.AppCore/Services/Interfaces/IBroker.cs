@@ -5,6 +5,6 @@ namespace MQTTBroker.AppCore.Services.Interface;
 public interface IBroker
 {
     void Start();
-    
-    void ExecuteCommand(ICommand command);
+
+    void AddCommandToQueue(ICommand command);
 }

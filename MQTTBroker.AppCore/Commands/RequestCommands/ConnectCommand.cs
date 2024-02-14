@@ -1,12 +1,12 @@
 using MQTTBroker.AppCore.Services;
 
-namespace MQTTBroker.AppCore.Commands;
+namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
 public class ConnectCommand : ICommand
 {
     private readonly byte[] _data;
     public TcpConnection TcpConnection { get; }
-    
+
     private const string ProtocolName = "MQIsdp";
     private const ushort ProtocolVersionNumber = 3;
     private const ushort KeepAliveTimer = 120;

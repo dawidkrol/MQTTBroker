@@ -47,7 +47,7 @@ public class TopicManager : ICrudTopicService, ISubscribeOperationsService, IMes
         }
     }
 
-    public void PublishMessage(string topicName, string message)
+    public void PublishMessage(string topicName, byte[] message)
     {
         var topic = Topics.SingleOrDefault(x => x.Name == topicName) ?? throw new NotFoundException($"Cannot find topic witch name = {topicName}");
         foreach (var subscriber in topic.Subscribers)

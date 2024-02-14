@@ -1,5 +1,7 @@
 namespace MQTTBroker.AppCore.Services;
 
+using MQTTBroker.AppCore.Commands;
+using MQTTBroker.AppCore.Services.Interface;
 using System;
 using System.Net.Sockets;
 using System.Text;
@@ -10,12 +12,14 @@ public class TcpConnection
     public bool IsConnectionEstablished { get; set; }
     private TcpClient _client;
     private NetworkStream _stream;
+    private IBroker _broker;
     // private Queue<string> _messageQueue = new Queue<string>();
 
-    public TcpConnection(TcpClient client)
+    public TcpConnection(TcpClient client, IBroker broker)
     {
         _client = client;
         _stream = _client.GetStream();
+        _broker = broker;
     }
 
     public async Task StartAsync()
@@ -27,6 +31,10 @@ public class TcpConnection
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            if (IsConnected())
+            {
+                await StartAsync();
+            }
         }
         finally
         {
@@ -34,13 +42,12 @@ public class TcpConnection
         }
     }
 
-    public async Task SendMessageAsync(string message)
+    public async Task SendMessageAsync(byte[] message)
     {
         // if (_messageQueue.TryDequeue(out string message))
         try
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            await _stream.WriteAsync(buffer, 0, buffer.Length);
+            await _stream.WriteAsync(message, 0, message.Length);
             await _stream.FlushAsync();
         }
         catch (Exception ex)
@@ -86,7 +93,8 @@ public class TcpConnection
             string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
             Console.WriteLine($"Received message: {receivedMessage}");
 
-            // Process the received message as needed
+            var command = CommandFactory.CreateCommand(buffer, this);
+            _broker.AddCommandToQueue(command);
         }
     }
 }

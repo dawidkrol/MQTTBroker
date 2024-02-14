@@ -1,22 +1,24 @@
 using MQTTBroker.AppCore.Services;
 
-namespace MQTTBroker.AppCore.Commands;
+namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
-public class UnsubscribeCommand : ICommand
+public class SubscribeCommand : ICommand
 {
     private readonly byte[] _data;
-    public string TopicName { get; set; }
+
     public string MessageId { get; set; }
+    public string TopicName { get; set; }
     public TcpConnection TcpConnection { get; set; }
-    
-    public UnsubscribeCommand(byte[] data, TcpConnection tcpConnection)
+
+
+    public SubscribeCommand(byte[] _data, TcpConnection tcpConnection)
     {
-        _data = data;
+        this._data = _data;
         TcpConnection = tcpConnection;
-        ExtractData();
     }
-    
-    private void ExtractData()
+
+    // the client can subscribe only one topic at a time
+    public void ExtractData()
     {
         MessageId = System.Text.Encoding.UTF8.GetString(_data[..2]);
         var topicLength = _data[2] << 8 | _data[3];

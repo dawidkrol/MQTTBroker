@@ -1,3 +1,4 @@
+using MQTTBroker.AppCore.Services.Interface;
 using System.Net.Sockets;
 
 namespace MQTTBroker.AppCore.Services;
@@ -6,11 +7,11 @@ public class ClientManager
 {
     private readonly List<TcpConnection> _connections;
     
-    public void AddTcpConnection(TcpClient client)
+    public async Task AddTcpConnection(TcpClient client, IBroker broker)
     {
-        var tcpConnection = new TcpConnection(client);
+        var tcpConnection = new TcpConnection(client, broker);
         _connections.Add(tcpConnection);
-        tcpConnection.StartAsync();
+        await tcpConnection.StartAsync();
     }
     
     public void ChangeConnectionStatus(TcpConnection connection, bool status)

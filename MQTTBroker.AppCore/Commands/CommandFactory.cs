@@ -1,10 +1,12 @@
+using MQTTBroker.AppCore.Commands.RequestCommands;
+using MQTTBroker.AppCore.Enums;
 using MQTTBroker.AppCore.Services;
 
 namespace MQTTBroker.AppCore.Commands;
 
-public class CommandFactory : ICommandFactory
+public static class CommandFactory
 {
-    public ICommand CreateCommand(byte[] data, TcpConnection tcpConnection)
+    public static ICommand CreateCommand(byte[] data, TcpConnection tcpConnection)
     {
         var messageType = (MessageType)(data[0] << 4);
         var remainingLength = 0;

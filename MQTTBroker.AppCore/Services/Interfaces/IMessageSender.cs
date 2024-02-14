@@ -2,5 +2,5 @@
 
 internal interface IMessageSender
 {
-    void PublishMessage(string topicName, string message);
+    void PublishMessage(string topicName, byte[] message);
 }

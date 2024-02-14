@@ -1,4 +1,4 @@
-namespace MQTTBroker.AppCore.Commands;
+namespace MQTTBroker.AppCore.Enums;
 
 public enum MessageType
 {
