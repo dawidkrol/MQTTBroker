@@ -38,7 +38,7 @@ public class TcpConnection
         }
         finally
         {
-            await CloseAsync();
+            Close();
         }
     }
 
@@ -56,7 +56,7 @@ public class TcpConnection
         }
     }
 
-    public async Task CloseAsync()
+    public void Close()
     {
         try
         {
@@ -82,8 +82,7 @@ public class TcpConnection
         byte[] buffer = new byte[1024];
         while (_client.Connected)
         {
-            // SendMessageAsync();
-            int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
+            int bytesRead = await _stream.ReadAsync(buffer);
             if (bytesRead == 0)
             {
                 Console.WriteLine("Client disconnected.");

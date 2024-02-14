@@ -3,9 +3,9 @@
 // QoS = 1
 public class PubAck
 {
-    public ushort MessageId { get; private set; }
+    public int MessageId { get; private set; }
 
-    public PubAck(ushort messageId)
+    public PubAck(int messageId)
     {
         MessageId = messageId;
     }

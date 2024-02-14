@@ -4,10 +4,10 @@ namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
 public class SubAck
 {
-    public ushort MessageId { get; private set; }
+    public int MessageId { get; private set; }
     public List<byte> GrantedQosLevels { get; private set; }
 
-    public SubAck(ushort messageId, List<byte> grantedQosLevels)
+    public SubAck(int messageId, List<byte> grantedQosLevels)
     {
         MessageId = messageId;
         GrantedQosLevels = grantedQosLevels;
@@ -19,8 +19,7 @@ public class SubAck
                             .TotalLenghOfCommand(GrantedQosLevels.Count + 4)
                                 .AddCommandType(Enums.MessageType.SubAck)
                                 .AddData(GrantedQosLevels.Count)
-                                .AddMessageId(MessageId)
-                                .AddData(GrantedQosLevels[0]);
+                                .AddMessageId(MessageId);
 
         for (int i = 0; i < GrantedQosLevels.Count; i++)
         {

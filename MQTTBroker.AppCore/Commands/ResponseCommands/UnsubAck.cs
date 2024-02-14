@@ -2,9 +2,9 @@
 
 public class UnsubAck
 {
-    public ushort MessageId { get; private set; }
+    public int MessageId { get; private set; }
 
-    public UnsubAck(ushort messageId)
+    public UnsubAck(int messageId)
     {
         MessageId = messageId;
     }
