@@ -1,6 +1,6 @@
 ﻿using MQTTBroker.AppCore.Enums;
 
-namespace MQTTBroker.AppCore.Commands
+namespace MQTTBroker.AppCore.Commands.Builder
 {
     public interface ICommandBuilder
     {

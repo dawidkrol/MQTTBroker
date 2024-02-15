@@ -2,12 +2,13 @@ namespace MQTTBroker.AppCore.Services;
 
 using MQTTBroker.AppCore.Commands;
 using MQTTBroker.AppCore.Services.Interface;
+using MQTTBroker.AppCore.Services.Interfaces;
 using System;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-public class TcpConnection
+public class TcpConnection : IDisposable, ITcpConnection
 {
     public bool IsConnectionEstablished { get; set; }
     private TcpClient _client;
@@ -44,7 +45,6 @@ public class TcpConnection
 
     public async Task SendMessageAsync(byte[] message)
     {
-        // if (_messageQueue.TryDequeue(out string message))
         try
         {
             await _stream.WriteAsync(message, 0, message.Length);
@@ -95,5 +95,10 @@ public class TcpConnection
             var command = CommandFactory.CreateCommand(buffer, this);
             _broker.AddCommandToQueue(command);
         }
+    }
+
+    public void Dispose()
+    {
+        Close();
     }
 }

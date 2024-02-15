@@ -1,8 +1,9 @@
 ﻿using System.Text;
+using MQTTBroker.AppCore.Commands.Builder;
 
 namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
-public class SubAck
+public class SubAck : IResponceCommand
 {
     public int MessageId { get; private set; }
     public List<byte> GrantedQosLevels { get; private set; }

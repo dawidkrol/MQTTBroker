@@ -1,6 +1,8 @@
-﻿namespace MQTTBroker.AppCore.Services.Interface;
+﻿using MQTTBroker.AppCore.Commands.RequestCommands;
 
-internal interface IMessageSender
+namespace MQTTBroker.AppCore.Services.Interface;
+
+public interface IMessageSender
 {
-    void PublishMessage(string topicName, byte[] message);
+    Task PublishMessage(PublishCommand publishCommand);
 }

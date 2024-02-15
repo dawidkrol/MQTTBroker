@@ -2,10 +2,11 @@
 using System.Net.Sockets;
 using MQTTBroker.AppCore.Commands.RequestCommands;
 using MQTTBroker.AppCore.Services.Interface;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Services;
 
-public class ConnectionListener
+public class ConnectionListener : IDisposable, IConnectionListener
 {
     private bool _shouldListen;
     private readonly TcpListener _listener;
@@ -42,4 +43,6 @@ public class ConnectionListener
     {
         _shouldListen = false;
     }
+
+    public void Dispose() => StopListening();
 }

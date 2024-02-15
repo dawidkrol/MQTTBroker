@@ -1,17 +1,17 @@
-using MQTTBroker.AppCore.Services;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
 public class PublishCommand : ICommand
 {
     private readonly byte[] _data;
-    public TcpConnection TcpConnection { get; }
+    public ITcpConnection TcpConnection { get; }
 
     public string TopicName { get; set; }
     public int MessageId { get; set; }
     public byte[] Payload { get; set; }
 
-    public PublishCommand(byte[] data, TcpConnection tcpConnection)
+    public PublishCommand(byte[] data, ITcpConnection tcpConnection)
     {
         _data = data;
         TcpConnection = tcpConnection;

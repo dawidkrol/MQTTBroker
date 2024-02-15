@@ -1,4 +1,4 @@
-using MQTTBroker.AppCore.Services;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
@@ -7,9 +7,9 @@ public class UnsubscribeCommand : ICommand
     private readonly byte[] _data;
     public string TopicName { get; set; }
     public int MessageId { get; set; }
-    public TcpConnection TcpConnection { get; set; }
+    public ITcpConnection TcpConnection { get; set; }
 
-    public UnsubscribeCommand(byte[] data, TcpConnection tcpConnection)
+    public UnsubscribeCommand(byte[] data, ITcpConnection tcpConnection)
     {
         _data = data;
         TcpConnection = tcpConnection;

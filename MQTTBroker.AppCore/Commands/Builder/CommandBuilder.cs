@@ -1,6 +1,6 @@
 ﻿using MQTTBroker.AppCore.Enums;
 
-namespace MQTTBroker.AppCore.Commands;
+namespace MQTTBroker.AppCore.Commands.Builder;
 
 public class CommandBuilder : ICommandBuilder
 {
@@ -16,12 +16,12 @@ public class CommandBuilder : ICommandBuilder
     private CommandBuilder(int lenOfCommand)
     {
         _lenOfCommand = lenOfCommand;
-        this.Reset();
+        Reset();
     }
 
     public void Reset()
     {
-        this._command = new byte[_lenOfCommand];
+        _command = new byte[_lenOfCommand];
     }
 
     public ICommandBuilder AddCommandType(MessageType messageType)

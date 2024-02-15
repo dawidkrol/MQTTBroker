@@ -1,12 +1,12 @@
-using MQTTBroker.AppCore.Services;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
 public class PingReqCommand : ICommand
 {
-    TcpConnection _tcpConnection;
+    ITcpConnection _tcpConnection;
 
-    public PingReqCommand(TcpConnection tcpConnection)
+    public PingReqCommand(ITcpConnection tcpConnection)
     {
         _tcpConnection = tcpConnection;
     }

@@ -1,6 +1,8 @@
-﻿namespace MQTTBroker.AppCore.Commands.ResponseCommands;
+﻿using MQTTBroker.AppCore.Commands.Builder;
 
-public class PingResp
+namespace MQTTBroker.AppCore.Commands.ResponseCommands;
+
+public class PingResp : IResponceCommand
 {
     public byte[] ToBuffer()
     {

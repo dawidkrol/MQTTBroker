@@ -1,6 +1,8 @@
-﻿namespace MQTTBroker.AppCore.Commands.ResponseCommands;
+﻿using MQTTBroker.AppCore.Commands.Builder;
 
-public class UnsubAck
+namespace MQTTBroker.AppCore.Commands.ResponseCommands;
+
+public class UnsubAck : IResponceCommand
 {
     public int MessageId { get; private set; }
 

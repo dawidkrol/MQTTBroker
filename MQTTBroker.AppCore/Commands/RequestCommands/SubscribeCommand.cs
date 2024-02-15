@@ -1,4 +1,4 @@
-using MQTTBroker.AppCore.Services;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
@@ -7,10 +7,10 @@ public class SubscribeCommand : ICommand
     private readonly byte[] _data;
     public int MessageId { get; set; }
     public string TopicName { get; set; }
-    public TcpConnection TcpConnection { get; set; }
+    public ITcpConnection TcpConnection { get; set; }
 
 
-    public SubscribeCommand(byte[] _data, TcpConnection tcpConnection)
+    public SubscribeCommand(byte[] _data, ITcpConnection tcpConnection)
     {
         this._data = _data;
         TcpConnection = tcpConnection;

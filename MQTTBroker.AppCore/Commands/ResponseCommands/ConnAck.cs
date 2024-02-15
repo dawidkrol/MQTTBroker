@@ -1,8 +1,9 @@
-﻿using MQTTBroker.AppCore.Enums;
+﻿using MQTTBroker.AppCore.Commands.Builder;
+using MQTTBroker.AppCore.Enums;
 
 namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
-public class ConnAck : ICommand
+public class ConnAck : IResponceCommand
 {
     public ConnackReturnCode ReturnCode { get; private set; }
 

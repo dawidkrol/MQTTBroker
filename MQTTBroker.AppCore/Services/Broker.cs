@@ -2,31 +2,34 @@
 using MQTTBroker.AppCore.Commands.RequestCommands;
 using MQTTBroker.AppCore.Commands.ResponseCommands;
 using MQTTBroker.AppCore.Services.Interface;
+using MQTTBroker.AppCore.Services.Interfaces;
 using System.Collections.Concurrent;
 
 namespace MQTTBroker.AppCore.Services;
 
 public class Broker : IBroker
 {
-    private static Broker instance;
+    private static Broker _instance;
     public readonly string _host = "localhost";
     public readonly int _port = 1883;
-    private readonly ConnectionListener _connectionListener;
-    private readonly TopicManager _topicManager;
-    private readonly ClientManager _clientManager;
+    private readonly IConnectionListener _connectionListener;
+    private readonly ITopicManager _topicManager;
+    private readonly IClientManager _clientManager;
     private readonly ConcurrentQueue<ICommand> Commands = new();
     private CancellationTokenSource _cts = new();
     private Task _commandExecutionTask;
 
     public static IBroker GetBroker()
     {
-        instance ??= new Broker();
-        return instance;
+        _instance ??= new Broker();
+        return _instance;
     }
 
     private Broker()
     {
         _connectionListener = new ConnectionListener(_host, _port);
+        _clientManager = new ClientManager(this);
+        _topicManager = new TopicManager(this);
         _commandExecutionTask = Task.Run(() => ExecuteCommands(_cts.Token));
     }
 
@@ -66,30 +69,30 @@ public class Broker : IBroker
         switch (command)
         {
             case CreateTcpConnectionCommand createTcpConnectionCommand:
-                await _clientManager.AddTcpConnection(createTcpConnectionCommand.TcpClient, this);
+                await _clientManager.AddConnection(createTcpConnectionCommand);
                 break;
             case ConnectCommand connectCommand:
-                _clientManager.ChangeConnectionStatus(connectCommand.TcpConnection, true);
-                await connectCommand.TcpConnection.SendMessageAsync(new ConnAck(Enums.ConnackReturnCode.ConnectionAccepted).ToBuffer());
+                await _clientManager.EstablishConnection(connectCommand);
                 break;
             case DisconnectCommand disconnectCommand:
-                _topicManager.RemoveTcpConnection(disconnectCommand.TcpConnection);
+                _topicManager.RemoveTcpConnection(disconnectCommand);
                 break;
             case SubscribeCommand subscribeCommand:
-                _topicManager.SubscribeTopic(subscribeCommand.TopicName, subscribeCommand.TcpConnection);
-                await subscribeCommand.TcpConnection.SendMessageAsync(new SubAck(subscribeCommand.MessageId, [0, 1]).ToBuffer());
+                await _topicManager.SubscribeTopic(subscribeCommand);
                 break;
             case UnsubscribeCommand unsubscribeCommand:
-                _topicManager.UnsubscribeTopic(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
-                await unsubscribeCommand.TcpConnection.SendMessageAsync(new UnsubAck(unsubscribeCommand.MessageId).ToBuffer());
+                await _topicManager.UnsubscribeTopic(unsubscribeCommand);
                 break;
             case PublishCommand publishCommand:
-                _topicManager.PublishMessage(publishCommand.TopicName, publishCommand.Payload);
-                // For QoS = 1
-                await publishCommand.TcpConnection.SendMessageAsync(new PubAck(publishCommand.MessageId).ToBuffer());
+                await _topicManager.PublishMessage(publishCommand);
                 break;
             default:
                 throw new NotImplementedException();
         }
+    }
+
+    public async Task SendResponce(IResponceCommand responce, ITcpConnection connection)
+    {
+        await connection.SendMessageAsync(responce.ToBuffer());
     }
 }

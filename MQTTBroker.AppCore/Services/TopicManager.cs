@@ -1,58 +1,77 @@
-﻿using MQTTBroker.AppCore.Exceptions;
+﻿using MQTTBroker.AppCore.Commands.RequestCommands;
+using MQTTBroker.AppCore.Commands.ResponseCommands;
+using MQTTBroker.AppCore.Exceptions;
 using MQTTBroker.AppCore.Models;
 using MQTTBroker.AppCore.Services.Interface;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Services;
 
-public class TopicManager : ICrudTopicService, ISubscribeOperationsService, IMessageSender
+public class TopicManager : ITopicManager
 {
-    private List<Topic> Topics { get; set; } = new();
+    private readonly IBroker _broker;
+    private List<Topic> Topics { get; set; } = [];
+
+    public TopicManager(IBroker broker)
+    {
+        _broker = broker;
+    }
 
     public Topic? GetTopic(string topicName)
     {
         return Topics.SingleOrDefault(x => x.Name == topicName);
     }
 
-    public void SubscribeTopic(string topicName, TcpConnection subscriber)
+    public async Task SubscribeTopic(SubscribeCommand subscribeCommand)
     {
-        var topicToSubscribe = Topics.SingleOrDefault(x => x.Name == topicName);
+        var topicToSubscribe = Topics.SingleOrDefault(x => x.Name == subscribeCommand.TopicName);
         if (topicToSubscribe == null)
         {
             topicToSubscribe = new Topic
             {
-                Name = topicName,
-                Subscribers = new List<TcpConnection>()
+                Name = subscribeCommand.TopicName,
+                Subscribers = []
             };
             Topics.Add(topicToSubscribe);
         }
-        topicToSubscribe.Subscribers.Add(subscriber);
+        topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
+
+        await _broker.SendResponce(new SubAck(subscribeCommand.MessageId, [0, 1]), subscribeCommand.TcpConnection);
     }
 
-    public void UnsubscribeTopic(string name, TcpConnection tcpConnection)
+    public async Task UnsubscribeTopic(UnsubscribeCommand unsubscribeCommand)
     {
-        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Name == name) ?? throw new NotFoundException($"Cannot find topic witch name = {name}");
-        topicToUnsubscribe.Subscribers.Remove(tcpConnection);
-        
-        if (topicToUnsubscribe.Subscribers.Count == 0)
-        {
-            Topics.Remove(topicToUnsubscribe);
-        }
+        RemoveTopicSubscribtion(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
+        await _broker.SendResponce(new UnsubAck(unsubscribeCommand.MessageId), unsubscribeCommand.TcpConnection);
     }
-    
-    public void RemoveTcpConnection(TcpConnection tcpConnection)
+
+    public void RemoveTcpConnection(DisconnectCommand disconnectCommand)
     {
         foreach (var topic in Topics)
         {
-            UnsubscribeTopic(topic.Name, tcpConnection);
+            RemoveTopicSubscribtion(topic.Name, disconnectCommand.TcpConnection);
         }
     }
 
-    public void PublishMessage(string topicName, byte[] message)
+    public async Task PublishMessage(PublishCommand publishCommand)
     {
-        var topic = Topics.SingleOrDefault(x => x.Name == topicName) ?? throw new NotFoundException($"Cannot find topic witch name = {topicName}");
+        var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName) ?? throw new NotFoundException($"Cannot find topic witch name = {publishCommand.TopicName}");
         foreach (var subscriber in topic.Subscribers)
         {
-            subscriber.SendMessageAsync(message);
+            // potrzebujemy czekać na wysłanie przed odesłaniem ack?
+            subscriber.SendMessageAsync(publishCommand.Payload);
+        }
+        await _broker.SendResponce(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
+    }
+
+    private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
+    {
+        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Name == topicName) ?? throw new NotFoundException($"Cannot find topic witch name = {topicName}");
+        topicToUnsubscribe.Subscribers.Remove(tcpConnection);
+
+        if (topicToUnsubscribe.Subscribers.Count == 0)
+        {
+            Topics.Remove(topicToUnsubscribe);
         }
     }
 }

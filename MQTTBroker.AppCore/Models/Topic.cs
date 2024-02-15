@@ -1,10 +1,9 @@
-﻿using MQTTBroker.AppCore.Services;
+﻿using MQTTBroker.AppCore.Services.Interfaces;
 
-namespace MQTTBroker.AppCore.Models
+namespace MQTTBroker.AppCore.Models;
+
+public class Topic
 {
-    public class Topic
-    {
-        public string Name { get; set; }
-        public IList<TcpConnection> Subscribers { get; set; }
-    }
+    public string Name { get; set; }
+    public IList<ITcpConnection> Subscribers { get; set; }
 }

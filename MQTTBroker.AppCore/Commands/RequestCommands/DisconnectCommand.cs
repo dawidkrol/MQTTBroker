@@ -1,12 +1,12 @@
-using MQTTBroker.AppCore.Services;
+using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
 public class DisconnectCommand : ICommand
 {
-    public TcpConnection TcpConnection { get; set; }
+    public ITcpConnection TcpConnection { get; set; }
 
-    public DisconnectCommand(TcpConnection tcpConnection)
+    public DisconnectCommand(ITcpConnection tcpConnection)
     {
         TcpConnection = tcpConnection;
     }

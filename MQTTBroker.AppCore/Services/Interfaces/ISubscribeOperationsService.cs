@@ -1,8 +1,10 @@
-﻿namespace MQTTBroker.AppCore.Services.Interface;
+﻿using MQTTBroker.AppCore.Commands.RequestCommands;
 
-internal interface ISubscribeOperationsService
+namespace MQTTBroker.AppCore.Services.Interface;
+
+public interface ISubscribeOperationsService
 {
-    void SubscribeTopic(string topicName, TcpConnection subscriber);
+    Task SubscribeTopic(SubscribeCommand subscribeCommand);
 
-    void UnsubscribeTopic(string topicName, TcpConnection subscriber);
+    Task UnsubscribeTopic(UnsubscribeCommand unsubscribeCommand);
 }

@@ -1,7 +1,9 @@
-﻿namespace MQTTBroker.AppCore.Commands.ResponseCommands;
+﻿using MQTTBroker.AppCore.Commands.Builder;
+
+namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
 // QoS = 1
-public class PubAck
+public class PubAck : IResponceCommand
 {
     public int MessageId { get; private set; }
 
