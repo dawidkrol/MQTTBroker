@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using MQTTBroker.AppCore.Commands.RequestCommands;
-using MQTTBroker.AppCore.Services.Interface;
 using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Services;
@@ -28,15 +27,19 @@ public class ConnectionListener : IDisposable, IConnectionListener
 
     public void StartListening(IBroker broker)
     {
-        _listener.Start();
-        while (_shouldListen)
-        {
-            if (GotConnection() is { } tcpClient)
+        Task.Run(
+            () =>
             {
-                broker.AddCommandToQueue(new CreateTcpConnectionCommand(tcpClient));
-            }
-        }
-        _listener.Stop();
+                _listener.Start();
+                while (_shouldListen)
+                {
+                    if (GotConnection() is { } tcpClient)
+                    {
+                        broker.AddCommandToQueue(new CreateTcpConnectionCommand(tcpClient));
+                    }
+                }
+                _listener.Stop();
+        });
     }
 
     public void StopListening()

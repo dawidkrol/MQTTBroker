@@ -1,6 +1,4 @@
-﻿using MQTTBroker.AppCore.Services.Interface;
-
-namespace MQTTBroker.AppCore.Services.Interfaces
+﻿namespace MQTTBroker.AppCore.Services.Interfaces
 {
     public interface IConnectionListener
     {

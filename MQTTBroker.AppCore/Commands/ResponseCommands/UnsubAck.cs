@@ -1,8 +1,9 @@
 ﻿using MQTTBroker.AppCore.Commands.Builder;
+using MQTTBroker.AppCore.Enums;
 
 namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
-public class UnsubAck : IResponceCommand
+public class UnsubAck : IResponseCommand
 {
     public int MessageId { get; private set; }
 
@@ -15,7 +16,7 @@ public class UnsubAck : IResponceCommand
     {
         var builder = CommandBuilder
                         .TotalLenghOfCommand(4)
-                            .AddCommandType(Enums.MessageType.UnsubAck)
+                            .AddCommandType(MessageType.UnsubAck)
                             .AddData(2)
                             .AddMessageId(MessageId);
 

@@ -1,12 +1,9 @@
-namespace MQTTBroker.AppCore.Services;
-
-using MQTTBroker.AppCore.Commands;
-using MQTTBroker.AppCore.Services.Interface;
-using MQTTBroker.AppCore.Services.Interfaces;
-using System;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using MQTTBroker.AppCore.Commands;
+using MQTTBroker.AppCore.Services.Interfaces;
+
+namespace MQTTBroker.AppCore.Services;
 
 public class TcpConnection : IDisposable, ITcpConnection
 {

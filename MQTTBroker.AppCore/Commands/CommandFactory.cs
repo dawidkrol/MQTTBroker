@@ -23,7 +23,9 @@ public static class CommandFactory
         } while ((digit & 128) != 0);
         
         var message = data[2..(remainingLength + 2)];
-
+        
+        Console.WriteLine($"Message type received: {messageType}");
+        
         return messageType switch
         {
             MessageType.Connect => new ConnectCommand(message, tcpConnection),

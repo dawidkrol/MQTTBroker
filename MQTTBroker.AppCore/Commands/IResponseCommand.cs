@@ -1,6 +1,6 @@
 ﻿namespace MQTTBroker.AppCore.Commands;
 
-public interface IResponceCommand : ICommand
+public interface IResponseCommand : ICommand
 {
     byte[] ToBuffer();
 }

@@ -1,14 +1,14 @@
+using System.Net.Sockets;
 using MQTTBroker.AppCore.Commands.RequestCommands;
 using MQTTBroker.AppCore.Commands.ResponseCommands;
-using MQTTBroker.AppCore.Services.Interface;
+using MQTTBroker.AppCore.Enums;
 using MQTTBroker.AppCore.Services.Interfaces;
-using System.Net.Sockets;
 
 namespace MQTTBroker.AppCore.Services;
 
 public class ClientManager : IClientManager
 {
-    private readonly List<ITcpConnection> _connections;
+    private readonly List<ITcpConnection> _connections = new();
     private readonly IBroker _broker;
 
     public ClientManager(IBroker broker)
@@ -31,7 +31,7 @@ public class ClientManager : IClientManager
     public async Task EstablishConnection(ConnectCommand connectCommand)
     {
         ChangeConnectionStatus(connectCommand.TcpConnection, true);
-        await _broker.SendResponce(new ConnAck(Enums.ConnackReturnCode.ConnectionAccepted), connectCommand.TcpConnection);
+        await _broker.SendResponse(new ConnAck(ConnackReturnCode.ConnectionAccepted), connectCommand.TcpConnection);
     }
 
     public async Task AddConnection(CreateTcpConnectionCommand createTcpConnectionCommand)

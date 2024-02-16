@@ -5,7 +5,7 @@ namespace MQTTBroker.AppCore.Commands.Builder;
 public class CommandBuilder : ICommandBuilder
 {
     private byte[] _command = new byte[10];
-    private int _pointer = 0;
+    private int _pointer;
     private readonly int _lenOfCommand;
 
     public static CommandBuilder TotalLenghOfCommand(int lenOfCommand)

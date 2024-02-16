@@ -3,7 +3,7 @@ using MQTTBroker.AppCore.Enums;
 
 namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
-public class ConnAck : IResponceCommand
+public class ConnAck : IResponseCommand
 {
     public ConnackReturnCode ReturnCode { get; private set; }
 

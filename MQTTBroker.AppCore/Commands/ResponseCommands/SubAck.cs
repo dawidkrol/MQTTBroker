@@ -1,9 +1,9 @@
-﻿using System.Text;
-using MQTTBroker.AppCore.Commands.Builder;
+﻿using MQTTBroker.AppCore.Commands.Builder;
+using MQTTBroker.AppCore.Enums;
 
 namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 
-public class SubAck : IResponceCommand
+public class SubAck : IResponseCommand
 {
     public int MessageId { get; private set; }
     public List<byte> GrantedQosLevels { get; private set; }
@@ -18,7 +18,7 @@ public class SubAck : IResponceCommand
     {
         var builder = CommandBuilder
                             .TotalLenghOfCommand(GrantedQosLevels.Count + 4)
-                                .AddCommandType(Enums.MessageType.SubAck)
+                                .AddCommandType(MessageType.SubAck)
                                 .AddData(GrantedQosLevels.Count)
                                 .AddMessageId(MessageId);
 

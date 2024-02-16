@@ -2,7 +2,6 @@
 using MQTTBroker.AppCore.Commands.ResponseCommands;
 using MQTTBroker.AppCore.Exceptions;
 using MQTTBroker.AppCore.Models;
-using MQTTBroker.AppCore.Services.Interface;
 using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Services;
@@ -10,7 +9,7 @@ namespace MQTTBroker.AppCore.Services;
 public class TopicManager : ITopicManager
 {
     private readonly IBroker _broker;
-    private List<Topic> Topics { get; set; } = [];
+    private List<Topic> Topics { get; set; } = new();
 
     public TopicManager(IBroker broker)
     {
@@ -30,19 +29,19 @@ public class TopicManager : ITopicManager
             topicToSubscribe = new Topic
             {
                 Name = subscribeCommand.TopicName,
-                Subscribers = []
+                Subscribers = new List<ITcpConnection>()
             };
             Topics.Add(topicToSubscribe);
         }
         topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
 
-        await _broker.SendResponce(new SubAck(subscribeCommand.MessageId, [0, 1]), subscribeCommand.TcpConnection);
+        await _broker.SendResponse(new SubAck(subscribeCommand.MessageId, new List<byte>{0, 1}), subscribeCommand.TcpConnection);
     }
 
     public async Task UnsubscribeTopic(UnsubscribeCommand unsubscribeCommand)
     {
         RemoveTopicSubscribtion(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
-        await _broker.SendResponce(new UnsubAck(unsubscribeCommand.MessageId), unsubscribeCommand.TcpConnection);
+        await _broker.SendResponse(new UnsubAck(unsubscribeCommand.MessageId), unsubscribeCommand.TcpConnection);
     }
 
     public void RemoveTcpConnection(DisconnectCommand disconnectCommand)
@@ -61,7 +60,7 @@ public class TopicManager : ITopicManager
             // potrzebujemy czekać na wysłanie przed odesłaniem ack?
             subscriber.SendMessageAsync(publishCommand.Payload);
         }
-        await _broker.SendResponce(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
+        await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
 
     private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)

@@ -1,21 +1,19 @@
-﻿using MQTTBroker.AppCore.Commands;
+﻿using System.Collections.Concurrent;
+using MQTTBroker.AppCore.Commands;
 using MQTTBroker.AppCore.Commands.RequestCommands;
-using MQTTBroker.AppCore.Commands.ResponseCommands;
-using MQTTBroker.AppCore.Services.Interface;
 using MQTTBroker.AppCore.Services.Interfaces;
-using System.Collections.Concurrent;
 
 namespace MQTTBroker.AppCore.Services;
 
 public class Broker : IBroker
 {
-    private static Broker _instance;
-    public readonly string _host = "localhost";
-    public readonly int _port = 1883;
+    private static Broker _instance = null!;
+    private const string Host = "127.0.0.1";
+    private const int Port = 1884;
     private readonly IConnectionListener _connectionListener;
     private readonly ITopicManager _topicManager;
     private readonly IClientManager _clientManager;
-    private readonly ConcurrentQueue<ICommand> Commands = new();
+    private readonly ConcurrentQueue<ICommand> _commands = new();
     private CancellationTokenSource _cts = new();
     private Task _commandExecutionTask;
 
@@ -27,7 +25,7 @@ public class Broker : IBroker
 
     private Broker()
     {
-        _connectionListener = new ConnectionListener(_host, _port);
+        _connectionListener = new ConnectionListener(Host, Port);
         _clientManager = new ClientManager(this);
         _topicManager = new TopicManager(this);
         _commandExecutionTask = Task.Run(() => ExecuteCommands(_cts.Token));
@@ -40,14 +38,14 @@ public class Broker : IBroker
 
     public void AddCommandToQueue(ICommand command)
     {
-        Commands.Enqueue(command);
+        _commands.Enqueue(command);
     }
 
     private async Task ExecuteCommands(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (Commands.TryDequeue(out ICommand command))
+            if (_commands.TryDequeue(out ICommand command))
             {
                 await ExecuteCommand(command);
             }
@@ -58,10 +56,11 @@ public class Broker : IBroker
         }
     }
 
-    public void Stop()
+    public async void Stop()
     {
-        _cts.Cancel();
-        _commandExecutionTask.Wait();
+        _connectionListener.StopListening();
+        await _commandExecutionTask.WaitAsync(_cts.Token);
+        await _cts.CancelAsync();
     }
 
     private async Task ExecuteCommand(ICommand command)
@@ -91,8 +90,8 @@ public class Broker : IBroker
         }
     }
 
-    public async Task SendResponce(IResponceCommand responce, ITcpConnection connection)
+    public async Task SendResponse(IResponseCommand response, ITcpConnection connection)
     {
-        await connection.SendMessageAsync(responce.ToBuffer());
+        await connection.SendMessageAsync(response.ToBuffer());
     }
 }

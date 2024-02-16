@@ -1,13 +1,14 @@
 ﻿using MQTTBroker.AppCore.Commands;
-using MQTTBroker.AppCore.Services.Interfaces;
 
-namespace MQTTBroker.AppCore.Services.Interface;
+namespace MQTTBroker.AppCore.Services.Interfaces;
 
 public interface IBroker
 {
     void Start();
+    
+    void Stop();
 
     void AddCommandToQueue(ICommand command);
 
-    Task SendResponce(IResponceCommand responce, ITcpConnection connection);
+    Task SendResponse(IResponseCommand response, ITcpConnection connection);
 }

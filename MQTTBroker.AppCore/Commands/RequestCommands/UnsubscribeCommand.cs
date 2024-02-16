@@ -1,3 +1,4 @@
+using System.Text;
 using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
@@ -20,6 +21,6 @@ public class UnsubscribeCommand : ICommand
     {
         MessageId = (_data[0] << 8) | _data[1];
         var topicLength = _data[2] << 8 | _data[3];
-        TopicName = System.Text.Encoding.UTF8.GetString(_data[4..(topicLength + 4)]);
+        TopicName = Encoding.UTF8.GetString(_data[4..(topicLength + 4)]);
     }
 }
