@@ -6,5 +6,6 @@ namespace MQTTBroker.AppCore.Services.Interfaces
     {
         Task AddConnection(CreateTcpConnectionCommand createTcpConnectionCommand);
         Task EstablishConnection(ConnectCommand connectCommand);
+        Task Ping(PingReqCommand pingReqCommand);
     }
 }

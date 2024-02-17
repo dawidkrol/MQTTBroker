@@ -86,6 +86,9 @@ public class Broker : IBroker
             case PublishCommand publishCommand:
                 await _topicManager.PublishMessage(publishCommand);
                 break;
+            case PingReqCommand pingReqCommand:
+                await _clientManager.Ping(pingReqCommand);
+                break;
             default:
                 throw new NotImplementedException();
         }

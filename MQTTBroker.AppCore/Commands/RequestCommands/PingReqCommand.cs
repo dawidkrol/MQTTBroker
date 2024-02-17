@@ -4,10 +4,10 @@ namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
 public class PingReqCommand : ICommand
 {
-    ITcpConnection _tcpConnection;
+    public ITcpConnection TcpConnection;
 
     public PingReqCommand(ITcpConnection tcpConnection)
     {
-        _tcpConnection = tcpConnection;
+        TcpConnection = tcpConnection;
     }
 }

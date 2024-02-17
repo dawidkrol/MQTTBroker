@@ -38,4 +38,9 @@ public class ClientManager : IClientManager
     {
         await AddTcpConnection(createTcpConnectionCommand.TcpClient);
     }
+
+    public async Task Ping(PingReqCommand pingReqCommand)
+    {
+        await _broker.SendResponse(new PingResp(), pingReqCommand.TcpConnection);
+    }
 }
