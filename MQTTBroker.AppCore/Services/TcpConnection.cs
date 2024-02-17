@@ -24,7 +24,7 @@ public class TcpConnection : IDisposable, ITcpConnection
     {
         try
         {
-            await ReceiveMessagesAsync();
+            ReceiveMessagesAsync();
         }
         catch (Exception ex)
         {
@@ -33,10 +33,6 @@ public class TcpConnection : IDisposable, ITcpConnection
             {
                 await StartAsync();
             }
-        }
-        finally
-        {
-            Close();
         }
     }
 
@@ -74,24 +70,27 @@ public class TcpConnection : IDisposable, ITcpConnection
         return _client.Connected;
     }
 
-    private async Task ReceiveMessagesAsync()
+    private void ReceiveMessagesAsync()
     {
-        byte[] buffer = new byte[1024];
-        while (_client.Connected)
-        {
-            int bytesRead = await _stream.ReadAsync(buffer);
-            if (bytesRead == 0)
+        Task.Run(async () =>
             {
-                Console.WriteLine("Client disconnected.");
-                break;
+                while (IsConnected())
+                {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = await _stream.ReadAsync(buffer);
+                    if (bytesRead == 0)
+                    {
+                        break;
+                    }
+
+                    string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine($"Received message: {receivedMessage}");
+
+                    var command = CommandFactory.CreateCommand(buffer, this);
+                    _broker.AddCommandToQueue(command);
+                }
             }
-
-            string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            Console.WriteLine($"Received message: {receivedMessage}");
-
-            var command = CommandFactory.CreateCommand(buffer, this);
-            _broker.AddCommandToQueue(command);
-        }
+        );
     }
 
     public void Dispose()

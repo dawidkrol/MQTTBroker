@@ -35,7 +35,7 @@ public class TopicManager : ITopicManager
         }
         topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
 
-        await _broker.SendResponse(new SubAck(subscribeCommand.MessageId, new List<byte>{0, 1}), subscribeCommand.TcpConnection);
+        await _broker.SendResponse(new SubAck(subscribeCommand.MessageId, new List<byte>{0}), subscribeCommand.TcpConnection);
     }
 
     public async Task UnsubscribeTopic(UnsubscribeCommand unsubscribeCommand)

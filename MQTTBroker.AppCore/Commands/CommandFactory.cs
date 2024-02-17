@@ -8,7 +8,7 @@ public static class CommandFactory
 {
     public static ICommand CreateCommand(byte[] data, ITcpConnection tcpConnection)
     {
-        var messageType = (MessageType)(data[0] << 4);
+        var messageType = (MessageType)(data[0] >> 4);
         var remainingLength = 0;
         var multiplier = 1;
         var currentByte = 1;
@@ -23,9 +23,7 @@ public static class CommandFactory
         } while ((digit & 128) != 0);
         
         var message = data[2..(remainingLength + 2)];
-        
-        Console.WriteLine($"Message type received: {messageType}");
-        
+
         return messageType switch
         {
             MessageType.Connect => new ConnectCommand(message, tcpConnection),

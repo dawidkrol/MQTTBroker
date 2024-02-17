@@ -17,10 +17,10 @@ public class SubAck : IResponseCommand
     public byte[] ToBuffer()
     {
         var builder = CommandBuilder
-                            .TotalLenghOfCommand(GrantedQosLevels.Count + 4)
-                                .AddCommandType(MessageType.SubAck)
-                                .AddData(GrantedQosLevels.Count)
-                                .AddMessageId(MessageId);
+                        .TotalLenghOfCommand(GrantedQosLevels.Count + 4)
+                        .AddCommandType(MessageType.SubAck)
+                        .AddData(GrantedQosLevels.Count)
+                        .AddMessageId(MessageId);
 
         for (int i = 0; i < GrantedQosLevels.Count; i++)
         {

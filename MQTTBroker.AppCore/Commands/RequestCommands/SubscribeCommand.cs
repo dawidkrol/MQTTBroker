@@ -15,6 +15,7 @@ public class SubscribeCommand : ICommand
     {
         this._data = _data;
         TcpConnection = tcpConnection;
+        ExtractData();
     }
 
     // the client can subscribe only one topic at a time

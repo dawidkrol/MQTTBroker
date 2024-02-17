@@ -65,6 +65,7 @@ public class Broker : IBroker
 
     private async Task ExecuteCommand(ICommand command)
     {
+        Console.WriteLine("Executing command: " + command.GetType().Name);
         switch (command)
         {
             case CreateTcpConnectionCommand createTcpConnectionCommand:
