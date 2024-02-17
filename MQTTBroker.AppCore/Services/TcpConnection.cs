@@ -45,7 +45,7 @@ public class TcpConnection : IDisposable, ITcpConnection
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error sending message: {ex.Message}");
+            Console.WriteLine($"Error sending message: {ex}");
         }
     }
 

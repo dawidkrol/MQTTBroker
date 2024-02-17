@@ -27,7 +27,7 @@ public static class CommandFactory
         return messageType switch
         {
             MessageType.Connect => new ConnectCommand(message, tcpConnection),
-            MessageType.Publish => new PublishCommand(message, tcpConnection),
+            MessageType.Publish => new PublishCommand(message, tcpConnection, data),
             MessageType.Subscribe => new SubscribeCommand(message, tcpConnection),
             MessageType.Unsubscribe => new UnsubscribeCommand(message, tcpConnection),
             MessageType.PingReq => new PingReqCommand(tcpConnection),

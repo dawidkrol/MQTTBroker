@@ -6,15 +6,17 @@ namespace MQTTBroker.AppCore.Commands.RequestCommands;
 public class PublishCommand : ICommand, IResponseCommand
 {
     private readonly byte[] _data;
+    private readonly byte[] _originalMessage;
     public ITcpConnection TcpConnection { get; }
 
     public string TopicName { get; set; }
     public int MessageId { get; set; }
     public byte[] Payload { get; set; }
 
-    public PublishCommand(byte[] data, ITcpConnection tcpConnection)
+    public PublishCommand(byte[] data, ITcpConnection tcpConnection, byte[] originalMessage)
     {
         _data = data;
+        _originalMessage = originalMessage;
         TcpConnection = tcpConnection;
         ExtractData();
     }
@@ -29,6 +31,6 @@ public class PublishCommand : ICommand, IResponseCommand
 
     public byte[] ToBuffer()
     {
-        return _data;
+        return _originalMessage[..2].Concat(_data).ToArray();
     }
 }
