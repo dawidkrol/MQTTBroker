@@ -57,8 +57,7 @@ public class TopicManager : ITopicManager
         var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName) ?? throw new NotFoundException($"Cannot find topic witch name = {publishCommand.TopicName}");
         foreach (var subscriber in topic.Subscribers)
         {
-            // potrzebujemy czekać na wysłanie przed odesłaniem ack?
-            subscriber.SendMessageAsync(publishCommand.Payload);
+            await _broker.SendResponse(publishCommand, subscriber);
         }
         await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }

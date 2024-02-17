@@ -3,7 +3,7 @@ using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Commands.RequestCommands;
 
-public class PublishCommand : ICommand
+public class PublishCommand : ICommand, IResponseCommand
 {
     private readonly byte[] _data;
     public ITcpConnection TcpConnection { get; }
@@ -25,5 +25,10 @@ public class PublishCommand : ICommand
         TopicName = Encoding.UTF8.GetString(_data[2..(topicLength + 2)]);
         MessageId = _data[topicLength + 2] << 8 | _data[topicLength + 4];
         Payload = _data[(topicLength + 5)..];
+    }
+
+    public byte[] ToBuffer()
+    {
+        return _data;
     }
 }
