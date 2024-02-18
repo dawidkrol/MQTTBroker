@@ -1,8 +1,9 @@
 using System.Text;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Protocol;
 
-namespace MqttPublisher;
+namespace ClientApp;
 
 public static class Program
 {
@@ -27,31 +28,17 @@ public static class Program
             )
             .Build();
 
-        await Task.Delay(2000);
-
-        var result = await client.SubscribeAsync(mqttSubscribeOptions);
-
-        await Task.Delay(2000);
-
+        await client.SubscribeAsync(mqttSubscribeOptions);
+        
         await SendMessages(client);
-        //await client.PingAsync();
-
-        await Task.Delay(2000);
 
         await client.UnsubscribeAsync("DUPA");
-
-        await Task.Delay(2000);
-
-
-        //await client.SubscribeAsync(mqttSubscribeOptions);
-
-        //SendMessages(client);
-
-        //await client.UnsubscribeAsync("DUPA/Disconnect");
-
-        await CleanDisconnect(client);
-
+        await SendMessages(client);
+        await client.SubscribeAsync(mqttSubscribeOptions);
+        await client.UnsubscribeAsync("DUPA");
+        
         Console.ReadLine();
+        await CleanDisconnect(client);
     }
 
     private static async Task CleanDisconnect(IMqttClient mqttClient)
@@ -65,15 +52,6 @@ public static class Program
         var mqttFactory = new MqttFactory();
 
         var mqttClient = mqttFactory.CreateMqttClient();
-        // Use builder classes where possible in this project.
-
-        //string certFilePath = "../Certificates/http.pfx";
-        //string password = "RVbySf#FV8*!xG4&o4j6";
-
-        //var certs = new List<X509Certificate2>
-        //{
-        //    new (certFilePath)
-        //};
 
         var mqttClientOptions = new MqttClientOptionsBuilder()
             .WithClientId($"publ")
@@ -81,13 +59,8 @@ public static class Program
             .WithWillQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtMostOnce)
             .WithTcpServer("localhost", 1884)
             .Build();
-
-
-        // This will throw an exception if the server is not available.
-        // The result from this message returns additional data which was sent
-        // from the server. Please refer to the MQTT protocol specification for details.
+        
         var response = await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
-        //
         Console.WriteLine("The MQTT client is connected.");
 
         Console.Write(response.ResponseInformation);
@@ -97,21 +70,11 @@ public static class Program
 
     private static async Task SendMessages(IMqttClient mqttClient)
     {
-        //do
-        //{
-        //Console.WriteLine("Write your message!");
         var message = "message";
-
-        //Console.WriteLine("Now name topic:");
         var topic = "DUPA";
 
-        var messageBytes = Encoding.UTF8.GetBytes(message!);
-        var data = await mqttClient.PublishBinaryAsync(topic, messageBytes);
+        var messageBytes = Encoding.UTF8.GetBytes(message);
+        var data = await mqttClient.PublishBinaryAsync(topic, messageBytes, MqttQualityOfServiceLevel.AtMostOnce);
         await Console.Out.WriteLineAsync(data.IsSuccess.ToString());
-
-        //Console.WriteLine("Message sent. Continue or press Q to quit");
-        //    //wait 5 sec
-        //    Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-        //} while (Console.ReadKey().Key != ConsoleKey.Q);
     }
 }

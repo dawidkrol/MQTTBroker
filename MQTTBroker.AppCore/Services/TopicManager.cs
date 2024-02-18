@@ -35,7 +35,7 @@ public class TopicManager : ITopicManager
         }
         topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
 
-        await Console.Out.WriteLineAsync("Topic is subscribed");
+        await Console.Out.WriteLineAsync($"Topic {topicToSubscribe.Name} subscribed");
 
         await _broker.SendResponse(new SubAck(subscribeCommand.MessageId, new List<byte>{0}), subscribeCommand.TcpConnection);
     }
@@ -44,7 +44,7 @@ public class TopicManager : ITopicManager
     {
         RemoveTopicSubscribtion(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
         await _broker.SendResponse(new UnsubAck(unsubscribeCommand.MessageId), unsubscribeCommand.TcpConnection);
-        await Console.Out.WriteLineAsync("Topic is unsubscribed");
+        await Console.Out.WriteLineAsync($"Topic {unsubscribeCommand.TopicName} unsubscribed");
     }
 
     public void RemoveTcpConnection(DisconnectCommand disconnectCommand)
@@ -66,10 +66,7 @@ public class TopicManager : ITopicManager
             {
                 try
                 {
-                    if (subscriber != publishCommand.TcpConnection)
-                    {
-                        await _broker.SendResponse(publishCommand, subscriber);
-                    }
+                    await _broker.SendResponse(publishCommand, subscriber);
                 }
                 catch (Exception ex)
                 {

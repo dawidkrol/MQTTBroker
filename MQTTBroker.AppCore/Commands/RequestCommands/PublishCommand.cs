@@ -25,8 +25,15 @@ public class PublishCommand : ICommand, IResponseCommand
     {
         var topicLength = _data[0] << 8 | _data[1];
         TopicName = Encoding.UTF8.GetString(_data[2..(topicLength + 2)]);
-        MessageId = _data[topicLength + 2] << 8 | _data[topicLength + 4];
-        Payload = _data[(topicLength + 5)..];
+        if (_data.Length > topicLength + 4)
+        {
+            MessageId = _data[topicLength + 2] << 8 | _data[topicLength + 4];
+            Payload = _data[(topicLength + 5)..];
+        }
+        else
+        {
+            Payload = _data[(topicLength + 2)..];
+        }
     }
 
     public byte[] ToBuffer()

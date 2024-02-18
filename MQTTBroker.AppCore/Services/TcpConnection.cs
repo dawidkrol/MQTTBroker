@@ -11,7 +11,6 @@ public class TcpConnection : IDisposable, ITcpConnection
     private TcpClient _client;
     private NetworkStream _stream;
     private IBroker _broker;
-    // private Queue<string> _messageQueue = new Queue<string>();
 
     public TcpConnection(TcpClient client, IBroker broker)
     {
@@ -76,7 +75,7 @@ public class TcpConnection : IDisposable, ITcpConnection
             {
                 while (IsConnected())
                 {
-                    byte[] buffer = new byte[128];
+                    byte[] buffer = new byte[1024];
                     int bytesRead = await _stream.ReadAsync(buffer);
                     if (bytesRead == 0)
                     {
@@ -84,13 +83,15 @@ public class TcpConnection : IDisposable, ITcpConnection
                     }
 
                     string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine($"Received message: {BitConverter.ToString(buffer)}");
+                    // Console.WriteLine($"Received message: {BitConverter.ToString(buffer)}");
 
                     try
                     {
                         var command = CommandFactory.CreateCommand(buffer, this);
                         if (command != null)
+                        {
                             _broker.AddCommandToQueue(command);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -99,7 +100,6 @@ public class TcpConnection : IDisposable, ITcpConnection
                     finally
                     {
                         _stream.Flush();
-                        buffer = new byte[128];
                     }
                 }
             }

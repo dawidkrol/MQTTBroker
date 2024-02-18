@@ -6,17 +6,16 @@ namespace MQTTBroker.AppCore.Commands;
 
 public static class CommandFactory
 {
-    public static ICommand CreateCommand(byte[] data, ITcpConnection tcpConnection)
+    public static ICommand? CreateCommand(byte[] data, ITcpConnection tcpConnection)
     {
         var messageType = (MessageType)(data[0] >> 4);
-        Console.WriteLine(messageType.ToString());
         var remainingLength = 0;
         var multiplier = 1;
         var currentByte = 1;
         byte digit;
 
         byte qos = (byte)(data[0] & 0b0000_0011);
-        Console.WriteLine("QoS = " + qos);
+        Console.WriteLine("Received command: " + messageType + " QoS = " + qos);
 
         do
         {
