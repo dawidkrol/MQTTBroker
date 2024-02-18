@@ -2,7 +2,7 @@
 
 namespace MQTTBroker.AppCore.Services.Interfaces
 {
-    public interface IClientManager
+    public interface IConnectionManager
     {
         Task AddConnection(CreateTcpConnectionCommand createTcpConnectionCommand);
         Task EstablishConnection(ConnectCommand connectCommand);
