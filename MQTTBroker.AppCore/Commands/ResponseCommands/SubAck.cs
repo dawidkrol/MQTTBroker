@@ -6,7 +6,7 @@ namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 public class SubAck : IResponseCommand
 {
     public int MessageId { get; private set; }
-    public List<byte> GrantedQosLevels { get; private set; } = [0];
+    public List<byte> GrantedQosLevels { get; private set; }
 
     public SubAck(int messageId, List<byte> grantedQosLevels)
     {

@@ -72,7 +72,7 @@ public class Broker : IBroker
                 await _connectionManager.AddConnection(createTcpConnectionCommand);
                 break;
             case ConnectCommand connectCommand:
-                _connectionManager.AddTcpConnection(connectCommand.Client);
+                await _connectionManager.EstablishConnection(connectCommand);
                 break;
             case DisconnectCommand disconnectCommand:
                 _topicManager.RemoveTcpConnection(disconnectCommand);

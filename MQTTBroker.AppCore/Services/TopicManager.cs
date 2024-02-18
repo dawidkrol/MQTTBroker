@@ -60,19 +60,24 @@ public class TopicManager : ITopicManager
     {
         var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName);
 
-        foreach (var subscriber in topic?.Subscribers ?? [])
+        if (topic is not null)
         {
-            try
-            {   if (subscriber != publishCommand.TcpConnection)
+            foreach (var subscriber in topic.Subscribers)
+            {
+                try
                 {
-                    await _broker.SendResponse(publishCommand, subscriber);
+                    if (subscriber != publishCommand.TcpConnection)
+                    {
+                        await _broker.SendResponse(publishCommand, subscriber);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending message: {ex}");
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error sending message: {ex}");
-            }
         }
+
         await Console.Out.WriteLineAsync("Message has been published");
         //await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
