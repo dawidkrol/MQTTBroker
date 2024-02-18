@@ -38,7 +38,7 @@ public class PublishCommand : ICommand, IResponseCommand
 
     public byte[] ToBuffer()
     {
-        Console.WriteLine($"Sending message: {BitConverter.ToString(_originalMessage)}");
+        Console.WriteLine($"Sending message: \"{Encoding.UTF8.GetString(_originalMessage)}\": {BitConverter.ToString(_originalMessage)}");}
         return _originalMessage;
     }
 }
