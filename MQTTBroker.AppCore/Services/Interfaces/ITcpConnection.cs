@@ -3,7 +3,6 @@
     public interface ITcpConnection
     {
         bool IsConnectionEstablished { get; set; }
-
         void Close();
         void Dispose();
         bool IsConnected();

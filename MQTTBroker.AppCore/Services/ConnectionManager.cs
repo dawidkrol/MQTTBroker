@@ -6,12 +6,12 @@ using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Services;
 
-public class ClientManager : IClientManager
+public class ConnectionManager : IConnectionManager
 {
     private readonly List<ITcpConnection> _connections = new();
     private readonly IBroker _broker;
 
-    public ClientManager(IBroker broker)
+    public ConnectionManager(IBroker broker)
     {
         _broker = broker;
     }

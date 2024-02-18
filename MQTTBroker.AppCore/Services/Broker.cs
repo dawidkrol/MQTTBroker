@@ -12,7 +12,7 @@ public class Broker : IBroker
     private const int Port = 1884;
     private readonly IConnectionListener _connectionListener;
     private readonly ITopicManager _topicManager;
-    private readonly IClientManager _clientManager;
+    private readonly IConnectionManager _connectionManager;
     private readonly ConcurrentQueue<ICommand> _commands = new();
     private CancellationTokenSource _cts = new();
     private Task _commandExecutionTask;
@@ -25,15 +25,15 @@ public class Broker : IBroker
 
     private Broker()
     {
-        _connectionListener = new ConnectionListener(Host, Port);
-        _clientManager = new ClientManager(this);
+        _connectionListener = new ConnectionListener(Host, Port, this);
+        _connectionManager = new ConnectionManager(this);
         _topicManager = new TopicManager(this);
         _commandExecutionTask = Task.Run(() => ExecuteCommands(_cts.Token));
     }
 
     public void Start()
     {
-        _connectionListener.StartListening(this);
+        _connectionListener.StartListening();
     }
 
     public void AddCommandToQueue(ICommand command)
@@ -69,10 +69,10 @@ public class Broker : IBroker
         switch (command)
         {
             case CreateTcpConnectionCommand createTcpConnectionCommand:
-                await _clientManager.AddConnection(createTcpConnectionCommand);
+                await _connectionManager.AddConnection(createTcpConnectionCommand);
                 break;
             case ConnectCommand connectCommand:
-                await _clientManager.EstablishConnection(connectCommand);
+                _connectionManager.AddTcpConnection(connectCommand.Client);
                 break;
             case DisconnectCommand disconnectCommand:
                 _topicManager.RemoveTcpConnection(disconnectCommand);
@@ -87,7 +87,7 @@ public class Broker : IBroker
                 await _topicManager.PublishMessage(publishCommand);
                 break;
             case PingReqCommand pingReqCommand:
-                await _clientManager.Ping(pingReqCommand);
+                await _connectionManager.Ping(pingReqCommand);
                 break;
             default:
                 throw new NotImplementedException();
