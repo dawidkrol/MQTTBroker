@@ -25,7 +25,7 @@ public class TopicManager : ITopicManager
     public async Task SubscribeTopic(SubscribeCommand subscribeCommand)
     {
         if (subscribeCommand.TopicName.Contains("+") &&
-            !new Regex(@"^(?!\+)[a-zA-Z0-9]+(/(\+|[a-zA-Z0-9]+))*$")
+            !new Regex(@"^((\+\/)?[a-zA-Z0-9]+(\/(\+|[a-zA-Z0-9]+))*)|\+$")
                 .IsMatch(subscribeCommand.TopicName))
         {
             Console.WriteLine($"Wrong topic name, cannot subscribe to {subscribeCommand.TopicName}");
@@ -59,7 +59,8 @@ public class TopicManager : ITopicManager
 
     public async Task UnsubscribeTopic(UnsubscribeCommand unsubscribeCommand)
     {
-        RemoveTopicSubscribtion(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
+        var result = RemoveTopicSubscribtion(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
+        if (!result) return;
         await _broker.SendResponse(new UnsubAck(unsubscribeCommand.MessageId), unsubscribeCommand.TcpConnection);
         await Console.Out.WriteLineAsync($"Topic {unsubscribeCommand.TopicName} unsubscribed");
     }
@@ -112,15 +113,16 @@ public class TopicManager : ITopicManager
         //await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
 
-    private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
+    private bool RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
     {
         var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Pattern == topicName);
         if (topicToUnsubscribe == null)
         {
             Console.WriteLine("No topic to unsubscribe");
-            return;
+            return false;
         }
         
         topicToUnsubscribe.Unsubscribe(tcpConnection);
+        return true;
     }
 }
