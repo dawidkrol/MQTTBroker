@@ -4,6 +4,6 @@ namespace MQTTBroker.AppCore.Models;
 
 public class Topic
 {
-    public string Name { get; set; }
+    public string Pattern { get; set; }
     public IList<ITcpConnection> Subscribers { get; set; }
 }

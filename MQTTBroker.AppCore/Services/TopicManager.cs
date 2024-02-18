@@ -1,5 +1,7 @@
-﻿using MQTTBroker.AppCore.Commands.RequestCommands;
+﻿using System.Text.RegularExpressions;
+using MQTTBroker.AppCore.Commands.RequestCommands;
 using MQTTBroker.AppCore.Commands.ResponseCommands;
+using MQTTBroker.AppCore.Filters;
 using MQTTBroker.AppCore.Models;
 using MQTTBroker.AppCore.Services.Interfaces;
 
@@ -17,24 +19,39 @@ public class TopicManager : ITopicManager
 
     public Topic? GetTopic(string topicName)
     {
-        return Topics.SingleOrDefault(x => x.Name == topicName);
+        return Topics.SingleOrDefault(x => x.Pattern == topicName);
     }
 
     public async Task SubscribeTopic(SubscribeCommand subscribeCommand)
     {
-        var topicToSubscribe = Topics.SingleOrDefault(x => x.Name == subscribeCommand.TopicName);
+        if (subscribeCommand.TopicName.Contains("+") &&
+            !new Regex(@"^(?!\+)[a-zA-Z0-9]+(/(\+|[a-zA-Z0-9]+))*$")
+                .IsMatch(subscribeCommand.TopicName))
+        {
+            Console.WriteLine($"Wrong topic name, cannot subscribe to {subscribeCommand.TopicName}");
+            return;
+        }
+
+        if (subscribeCommand.TopicName.Contains("#") && !new Regex(@"(^#$)|(/#$)")
+                .IsMatch(subscribeCommand.TopicName))
+        {
+            Console.WriteLine($"Wrong topic name, cannot subscribe to {subscribeCommand.TopicName}");
+            return;
+        }
+
+        var topicToSubscribe = Topics.SingleOrDefault(x => x.Pattern == subscribeCommand.TopicName);
         if (topicToSubscribe == null)
         {
             topicToSubscribe = new Topic
             {
-                Name = subscribeCommand.TopicName,
+                Pattern = subscribeCommand.TopicName,
                 Subscribers = new List<ITcpConnection>()
             };
             Topics.Add(topicToSubscribe);
         }
         topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
 
-        await Console.Out.WriteLineAsync($"Topic {topicToSubscribe.Name} subscribed");
+        await Console.Out.WriteLineAsync($"Topic {topicToSubscribe.Pattern} subscribed");
 
         await _broker.SendResponse(new SubAck(subscribeCommand.MessageId, new List<byte>{0}), subscribeCommand.TcpConnection);
     }
@@ -50,7 +67,7 @@ public class TopicManager : ITopicManager
     {
         foreach (var topic in Topics)
         {
-            RemoveTopicSubscribtion(topic.Name, disconnectCommand.TcpConnection);
+            RemoveTopicSubscribtion(topic.Pattern, disconnectCommand.TcpConnection);
         }
         Topics.RemoveAll(x => x.Subscribers.Count == 0);
         Console.WriteLine("Removed tcp connection");
@@ -60,7 +77,7 @@ public class TopicManager : ITopicManager
     {
         foreach (var topic in Topics)
         {
-            RemoveTopicSubscribtion(topic.Name, removeDisconnectedClientCommand.TcpConnection);
+            RemoveTopicSubscribtion(topic.Pattern, removeDisconnectedClientCommand.TcpConnection);
         }
         Topics.RemoveAll(x => x.Subscribers.Count == 0);
         Console.WriteLine("Removed tcp connection");
@@ -68,9 +85,17 @@ public class TopicManager : ITopicManager
 
     public async Task PublishMessage(PublishCommand publishCommand)
     {
-        var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName);
+        if (publishCommand.TopicName.Contains("+") || publishCommand.TopicName.Contains("#") ||
+            publishCommand.TopicName.Contains("$") || publishCommand.TopicName.Contains("*"))
+        {
+            Console.WriteLine($"Wrong topic name, cannot publish on {publishCommand.TopicName}");
+            return;
+        }
 
-        if (topic is not null)
+        var topics = Topics
+            .Where(x => FilterTopicsComparer.Compare(publishCommand.TopicName, x.Pattern));
+
+        foreach (var topic in topics)
         {
             foreach (var subscriber in topic.Subscribers)
             {
@@ -86,12 +111,12 @@ public class TopicManager : ITopicManager
         }
 
         await Console.Out.WriteLineAsync("Message has been published");
-        //await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
+        await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
 
     private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
     {
-        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Name == topicName);
+        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Pattern == topicName);
         if (topicToUnsubscribe == null)
         {
             Console.WriteLine("No topic to unsubscribe");
