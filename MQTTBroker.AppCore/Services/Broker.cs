@@ -25,7 +25,7 @@ public class Broker : IBroker
 
     private Broker()
     {
-        _connectionListener = new ConnectionListener(Host, Port);
+        _connectionListener = new ConnectionListener(Host, Port, this);
         _clientManager = new ClientManager(this);
         _topicManager = new TopicManager(this);
         _commandExecutionTask = Task.Run(() => ExecuteCommands(_cts.Token));
@@ -33,7 +33,7 @@ public class Broker : IBroker
 
     public void Start()
     {
-        _connectionListener.StartListening(this);
+        _connectionListener.StartListening();
     }
 
     public void AddCommandToQueue(ICommand command)
@@ -72,7 +72,7 @@ public class Broker : IBroker
                 await _clientManager.AddConnection(createTcpConnectionCommand);
                 break;
             case ConnectCommand connectCommand:
-                await _clientManager.EstablishConnection(connectCommand);
+                _clientManager.AddTcpConnection(connectCommand.Client);
                 break;
             case DisconnectCommand disconnectCommand:
                 _topicManager.RemoveTcpConnection(disconnectCommand);

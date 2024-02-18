@@ -11,13 +11,15 @@ public class ConnectionListener : IDisposable, IConnectionListener
     private readonly TcpListener _listener;
     private readonly int _port;
     private readonly string _ipAddress;
+    private IBroker _broker;
 
-    public ConnectionListener(string ipAddress, int port)
+    public ConnectionListener(string ipAddress, int port, IBroker broker)
     {
         _port = port;
         _ipAddress = ipAddress;
         _listener = new TcpListener(IPAddress.Parse(_ipAddress), _port);
         _shouldListen = true;
+        _broker = broker;
     }
 
     private TcpClient GotConnection()
@@ -25,7 +27,7 @@ public class ConnectionListener : IDisposable, IConnectionListener
         return _listener.AcceptTcpClient();
     }
 
-    public void StartListening(IBroker broker)
+    public void StartListening()
     {
         Task.Run(
             () =>
@@ -35,7 +37,7 @@ public class ConnectionListener : IDisposable, IConnectionListener
                 {
                     if (GotConnection() is { } tcpClient)
                     {
-                        broker.AddCommandToQueue(new CreateTcpConnectionCommand(tcpClient));
+                        _broker.AddCommandToQueue(new CreateTcpConnectionCommand(tcpClient));
                     }
                 }
                 _listener.Stop();

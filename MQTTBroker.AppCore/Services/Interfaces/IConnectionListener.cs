@@ -3,7 +3,7 @@
     public interface IConnectionListener
     {
         void Dispose();
-        void StartListening(IBroker broker);
+        void StartListening();
         void StopListening();
     }
 }
