@@ -7,7 +7,7 @@ namespace MQTTBroker.AppCore.Services;
 
 public class Broker : IBroker
 {
-    private static Broker _instance = null!;
+    private static Broker _instance;
     private const string Host = "127.0.0.1";
     private const int Port = 1884;
     private readonly IConnectionListener _connectionListener;

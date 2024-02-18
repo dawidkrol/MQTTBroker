@@ -84,10 +84,21 @@ public class TcpConnection : IDisposable, ITcpConnection
                     }
 
                     string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine($"Received message: {receivedMessage}");
+                    Console.WriteLine($"Received message: {BitConverter.ToString(buffer)}");
 
-                    var command = CommandFactory.CreateCommand(buffer, this);
-                    _broker.AddCommandToQueue(command);
+                    try
+                    {
+                        var command = CommandFactory.CreateCommand(buffer, this);
+                        _broker.AddCommandToQueue(command);
+                        buffer = new byte[1024];
+                        _stream.Flush();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating command: {ex}");
+                        buffer = new byte[1024];
+                        _stream.Flush();
+                    }
                 }
             }
         );

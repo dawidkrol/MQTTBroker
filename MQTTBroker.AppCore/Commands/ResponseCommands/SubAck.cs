@@ -6,7 +6,7 @@ namespace MQTTBroker.AppCore.Commands.ResponseCommands;
 public class SubAck : IResponseCommand
 {
     public int MessageId { get; private set; }
-    public List<byte> GrantedQosLevels { get; private set; }
+    public List<byte> GrantedQosLevels { get; private set; } = [0];
 
     public SubAck(int messageId, List<byte> grantedQosLevels)
     {
@@ -19,7 +19,7 @@ public class SubAck : IResponseCommand
         var builder = CommandBuilder
                         .TotalLenghOfCommand(GrantedQosLevels.Count + 4)
                         .AddCommandType(MessageType.SubAck)
-                        .AddData(GrantedQosLevels.Count)
+                        .AddData(GrantedQosLevels.Count + 2)
                         .AddMessageId(MessageId);
 
         for (int i = 0; i < GrantedQosLevels.Count; i++)

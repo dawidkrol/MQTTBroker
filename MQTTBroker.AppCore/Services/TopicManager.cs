@@ -57,7 +57,14 @@ public class TopicManager : ITopicManager
         var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName) ?? throw new NotFoundException($"Cannot find topic witch name = {publishCommand.TopicName}");
         foreach (var subscriber in topic.Subscribers)
         {
-            await _broker.SendResponse(publishCommand, subscriber);
+            try
+            {
+                await _broker.SendResponse(publishCommand, subscriber);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message: {ex}");
+            }
         }
         await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
