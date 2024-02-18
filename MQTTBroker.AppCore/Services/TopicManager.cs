@@ -1,6 +1,5 @@
 ﻿using MQTTBroker.AppCore.Commands.RequestCommands;
 using MQTTBroker.AppCore.Commands.ResponseCommands;
-using MQTTBroker.AppCore.Exceptions;
 using MQTTBroker.AppCore.Models;
 using MQTTBroker.AppCore.Services.Interfaces;
 
@@ -53,6 +52,17 @@ public class TopicManager : ITopicManager
         {
             RemoveTopicSubscribtion(topic.Name, disconnectCommand.TcpConnection);
         }
+        Topics.RemoveAll(x => x.Subscribers.Count == 0);
+        Console.WriteLine("Removed tcp connection");
+    }
+    
+    public void RemoveTcpConnection(RemoveDisconnectedClientCommand removeDisconnectedClientCommand)
+    {
+        foreach (var topic in Topics)
+        {
+            RemoveTopicSubscribtion(topic.Name, removeDisconnectedClientCommand.TcpConnection);
+        }
+        Topics.RemoveAll(x => x.Subscribers.Count == 0);
         Console.WriteLine("Removed tcp connection");
     }
 
@@ -81,12 +91,13 @@ public class TopicManager : ITopicManager
 
     private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
     {
-        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Name == topicName) ?? throw new NotFoundException($"Cannot find topic witch name = {topicName}");
-        topicToUnsubscribe.Subscribers.Remove(tcpConnection);
-
-        if (topicToUnsubscribe.Subscribers.Count == 0)
+        var topicToUnsubscribe = Topics.SingleOrDefault(x => x.Name == topicName);
+        if (topicToUnsubscribe == null)
         {
-            Topics.Remove(topicToUnsubscribe);
+            Console.WriteLine("No topic to unsubscribe");
+            return;
         }
+        
+        topicToUnsubscribe.Subscribers.Remove(tcpConnection);
     }
 }

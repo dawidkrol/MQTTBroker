@@ -9,6 +9,7 @@ namespace MQTTBroker.AppCore.Services.Interfaces
         Topic? GetTopic(string topicName);
         Task PublishMessage(PublishCommand publishCommand);
         void RemoveTcpConnection(DisconnectCommand disconnectCommand);
+        void RemoveTcpConnection(RemoveDisconnectedClientCommand disconnectCommand);
         Task SubscribeTopic(SubscribeCommand subscribeCommand);
         Task UnsubscribeTopic(UnsubscribeCommand unsubscribeCommand);
     }

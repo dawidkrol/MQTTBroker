@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Text;
 using MQTTBroker.AppCore.Commands;
+using MQTTBroker.AppCore.Commands.RequestCommands;
 using MQTTBroker.AppCore.Services.Interfaces;
 
 namespace MQTTBroker.AppCore.Services;
@@ -8,6 +9,7 @@ namespace MQTTBroker.AppCore.Services;
 public class TcpConnection : IDisposable, ITcpConnection
 {
     public bool IsConnectionEstablished { get; set; }
+    public string ClientId { get; set; }
     private TcpClient _client;
     private NetworkStream _stream;
     private IBroker _broker;
@@ -52,7 +54,7 @@ public class TcpConnection : IDisposable, ITcpConnection
     {
         try
         {
-            if (_client.Connected)
+            if (IsConnected())
             {
                 _stream.Close();
                 _client.Close();
@@ -102,6 +104,7 @@ public class TcpConnection : IDisposable, ITcpConnection
                         _stream.Flush();
                     }
                 }
+                _broker.AddCommandToQueue(new RemoveDisconnectedClientCommand(this));
             }
         );
     }

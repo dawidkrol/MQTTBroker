@@ -76,6 +76,11 @@ public class Broker : IBroker
                 break;
             case DisconnectCommand disconnectCommand:
                 _topicManager.RemoveTcpConnection(disconnectCommand);
+                _connectionManager.RemoveTcpConnection(disconnectCommand);
+                break;
+            case RemoveDisconnectedClientCommand removeDisconnectedClientCommand:
+                _topicManager.RemoveTcpConnection(removeDisconnectedClientCommand);
+                _connectionManager.RemoveTcpConnection(removeDisconnectedClientCommand);
                 break;
             case SubscribeCommand subscribeCommand:
                 await _topicManager.SubscribeTopic(subscribeCommand);

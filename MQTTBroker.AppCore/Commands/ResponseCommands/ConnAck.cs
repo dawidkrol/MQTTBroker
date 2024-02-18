@@ -16,11 +16,11 @@ public class ConnAck : IResponseCommand
     {
 
         var builder = CommandBuilder
-                            .TotalLenghOfCommand(4)
-                                .AddCommandType(MessageType.ConnAck)
-                                .AddData(2)
-                                .AddEmptyLine()
-                                .AddConnectReturnCode(ReturnCode);
+                        .TotalLenghOfCommand(4)
+                        .AddCommandType(MessageType.ConnAck)
+                        .AddData(2)
+                        .AddEmptyLine()
+                        .AddConnectReturnCode(ReturnCode);
                                 
         return builder.Build();
     }
