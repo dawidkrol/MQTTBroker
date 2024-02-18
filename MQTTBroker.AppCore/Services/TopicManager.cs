@@ -49,7 +49,8 @@ public class TopicManager : ITopicManager
             };
             Topics.Add(topicToSubscribe);
         }
-        topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
+        
+        topicToSubscribe.Subscribe(subscribeCommand.TcpConnection);
 
         await Console.Out.WriteLineAsync($"Topic {topicToSubscribe.Pattern} subscribed");
 
@@ -97,21 +98,18 @@ public class TopicManager : ITopicManager
 
         foreach (var topic in topics)
         {
-            foreach (var subscriber in topic.Subscribers)
+            try
             {
-                try
-                {
-                    await _broker.SendResponse(publishCommand, subscriber);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error sending message: {ex}");
-                }
+                topic.Publish(publishCommand, _broker);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message: {ex}");
             }
         }
 
         await Console.Out.WriteLineAsync("Message has been published");
-        await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
+        //await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
 
     private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
@@ -123,6 +121,6 @@ public class TopicManager : ITopicManager
             return;
         }
         
-        topicToUnsubscribe.Subscribers.Remove(tcpConnection);
+        topicToUnsubscribe.Unsubscribe(tcpConnection);
     }
 }

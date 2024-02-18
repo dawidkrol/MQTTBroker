@@ -32,7 +32,7 @@ public class ConnectionManager : IConnectionManager
 
     private void ChangeConnectionStatus(ITcpConnection connection, bool status)
     {
-        connection.IsConnectionEstablished = status;
+        connection.SetConnectionEstablished(status);
     }
 
     public async Task EstablishConnection(ConnectCommand connectCommand)
@@ -42,7 +42,7 @@ public class ConnectionManager : IConnectionManager
             await _broker.SendResponse(new ConnAck(ConnackReturnCode.UnacceptableProtocolVersion), connectCommand.TcpConnection);
             _connections.Remove(connectCommand.TcpConnection);
         }
-        if (_connections.Any(connection => connection.ClientId == connectCommand.ClientId))
+        if (_connections.Any(connection => connection.GetClientId() == connectCommand.ClientId))
         {
             await _broker.SendResponse(new ConnAck(ConnackReturnCode.IdentifierRejected), connectCommand.TcpConnection);
             _connections.Remove(connectCommand.TcpConnection);
@@ -59,7 +59,7 @@ public class ConnectionManager : IConnectionManager
         }
         
         ChangeConnectionStatus(connectCommand.TcpConnection, true);
-        connectCommand.TcpConnection.ClientId = connectCommand.ClientId;
+        connectCommand.TcpConnection.SetClientId(connectCommand.ClientId);
         await _broker.SendResponse(new ConnAck(ConnackReturnCode.ConnectionAccepted), connectCommand.TcpConnection);
     }
     

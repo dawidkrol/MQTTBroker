@@ -2,8 +2,10 @@
 {
     public interface ITcpConnection
     {
-        bool IsConnectionEstablished { get; set; }
-        string ClientId { get; set; }
+        void SetConnectionEstablished(bool value);
+        bool IsConnectionEstablished();
+        void SetClientId(string clientId);
+        string GetClientId();
         void Close();
         void Dispose();
         bool IsConnected();

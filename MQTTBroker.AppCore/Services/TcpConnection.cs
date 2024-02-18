@@ -8,7 +8,7 @@ namespace MQTTBroker.AppCore.Services;
 
 public class TcpConnection : IDisposable, ITcpConnection
 {
-    public bool IsConnectionEstablished { get; set; }
+    private bool _isConnectionEstablished { get; set; }
     public string ClientId { get; set; }
     private TcpClient _client;
     private NetworkStream _stream;
@@ -19,6 +19,26 @@ public class TcpConnection : IDisposable, ITcpConnection
         _client = client;
         _stream = _client.GetStream();
         _broker = broker;
+    }
+
+    public void SetClientId(string clientId)
+    {
+        ClientId = clientId;
+    }
+
+    public string GetClientId()
+    {
+        return ClientId;
+    }
+
+    public bool IsConnectionEstablished()
+    {
+        return _isConnectionEstablished;
+    }
+
+    public void SetConnectionEstablished(bool value)
+    {
+        _isConnectionEstablished = value;
     }
 
     public async Task StartAsync()
