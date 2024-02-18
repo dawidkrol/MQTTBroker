@@ -1,4 +1,4 @@
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using MQTTnet;
 using MQTTnet.Client;
@@ -11,10 +11,11 @@ public static class Program
     {
         var client = await ConnectClient();
 
-        client.ApplicationMessageReceivedAsync += delegate(MqttApplicationMessageReceivedEventArgs args)
+        client.ApplicationMessageReceivedAsync += async (x) =>
         {
-            Console.WriteLine(Encoding.Default.GetString(args.ApplicationMessage.PayloadSegment));
-            return Task.CompletedTask;
+            await Console.Out.WriteAsync("Topic: " + x.ApplicationMessage.Topic.ToString());
+            await Console.Out.WriteLineAsync();
+            await Console.Out.WriteLineAsync("Payload: " + Encoding.Default.GetString(x.ApplicationMessage.Payload));
         };
 
         var mqttSubscribeOptions = new MqttFactory().CreateSubscribeOptionsBuilder()
@@ -28,16 +29,9 @@ public static class Program
             )
             .Build();
 
-        await Task.Delay(2000);
-
         var result = await client.SubscribeAsync(mqttSubscribeOptions);
 
-        await Task.Delay(2000);
-
-        await SendMessages(client);
-        //await client.PingAsync();
-
-        await Task.Delay(2000);
+        Console.ReadLine();
 
         await client.UnsubscribeAsync("DUPA");
 
@@ -106,8 +100,8 @@ public static class Program
         //Console.WriteLine("Now name topic:");
         var topic = "DUPA";
 
-        var messageBytes = Encoding.UTF8.GetBytes(message!);
-        var data = await mqttClient.PublishBinaryAsync(topic, messageBytes);
+        //var messageBytes = Encoding.UTF8.GetBytes(message!);
+        var data = await mqttClient.PublishStringAsync(topic, message);
         await Console.Out.WriteLineAsync(data.IsSuccess.ToString());
 
         //Console.WriteLine("Message sent. Continue or press Q to quit");

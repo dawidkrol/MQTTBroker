@@ -16,6 +16,7 @@ public static class CommandFactory
         byte digit;
 
         byte qos = (byte)(data[0] & 0b0000_0011);
+        Console.WriteLine("QoS = " + qos);
 
         do
         {
@@ -25,42 +26,17 @@ public static class CommandFactory
 
         } while ((digit & 128) != 0);
 
-        //if(qos != 0 && messageType == MessageType.Publish)
-        //{
-        //    throw new NotImplementedException("Wrong qos");
-        //    //messageType = MessageType.PingReq;
-        //}
         
-        var message = data[2..(remainingLength + 4)];
-
-        Console.WriteLine(remainingLength);
-
-        //if (messageType == MessageType.Publish && (data[0] & 0b0000_0001) == 1)
-        //{
-        //    throw new NotImplementedException("Wrong qos");
-        //}
-
-
-        //byte messageType_v2 = data[0];
-        //Console.WriteLine("Moj typ wiadomoœci: " + messageType);
-        //Console.WriteLine("Typ wiadomoœci (w formacie hex): " + messageType_v2.ToString("X"));
-        //Console.WriteLine("Typ wiadomoœci (w formacie dec): " + messageType_v2);
-
-        //// Odczytaj d³ugoœæ "remaining length"
-        //byte remainingLength_v2 = data[1];
-        //Console.WriteLine("Moje 'remaining length': " + remainingLength);
-        //Console.WriteLine("D³ugoœæ 'remaining length' (w formacie hex): " + remainingLength_v2.ToString("X"));
-        //Console.WriteLine("D³ugoœæ 'remaining length' (w formacie dec): " + remainingLength_v2);
-
+        var message = data[2..(remainingLength + 2)];
         return messageType switch
         {
             MessageType.Connect => new ConnectCommand(message, tcpConnection),
-            MessageType.Publish => new PublishCommand(message, tcpConnection, data),
+            MessageType.Publish => new PublishCommand(message, tcpConnection, data[..(remainingLength + 2)]),
             MessageType.Subscribe => new SubscribeCommand(message, tcpConnection),
             MessageType.Unsubscribe => new UnsubscribeCommand(message, tcpConnection),
             MessageType.PingReq => new PingReqCommand(tcpConnection),
             MessageType.Disconnect => new DisconnectCommand(tcpConnection),
-            _ => throw new NotImplementedException()
+            _ => null
         };
     }
 }

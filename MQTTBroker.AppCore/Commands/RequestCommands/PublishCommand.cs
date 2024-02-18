@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using MQTTBroker.AppCore.Services.Interfaces;
 
@@ -31,6 +32,7 @@ public class PublishCommand : ICommand, IResponseCommand
 
     public byte[] ToBuffer()
     {
-        return _originalMessage[..2].Concat(_data).ToArray();
+        Console.WriteLine($"Sending message: {BitConverter.ToString(_originalMessage)}");
+        return _originalMessage;
     }
 }

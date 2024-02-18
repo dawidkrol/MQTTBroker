@@ -76,7 +76,7 @@ public class TcpConnection : IDisposable, ITcpConnection
             {
                 while (IsConnected())
                 {
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[128];
                     int bytesRead = await _stream.ReadAsync(buffer);
                     if (bytesRead == 0)
                     {
@@ -89,15 +89,17 @@ public class TcpConnection : IDisposable, ITcpConnection
                     try
                     {
                         var command = CommandFactory.CreateCommand(buffer, this);
-                        _broker.AddCommandToQueue(command);
-                        buffer = new byte[1024];
-                        _stream.Flush();
+                        if (command != null)
+                            _broker.AddCommandToQueue(command);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error creating command: {ex}");
-                        buffer = new byte[1024];
+                    }
+                    finally
+                    {
                         _stream.Flush();
+                        buffer = new byte[128];
                     }
                 }
             }

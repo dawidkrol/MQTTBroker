@@ -35,6 +35,8 @@ public class TopicManager : ITopicManager
         }
         topicToSubscribe.Subscribers.Add(subscribeCommand.TcpConnection);
 
+        await Console.Out.WriteLineAsync("Topic is subscribed");
+
         await _broker.SendResponse(new SubAck(subscribeCommand.MessageId, new List<byte>{0}), subscribeCommand.TcpConnection);
     }
 
@@ -42,6 +44,7 @@ public class TopicManager : ITopicManager
     {
         RemoveTopicSubscribtion(unsubscribeCommand.TopicName, unsubscribeCommand.TcpConnection);
         await _broker.SendResponse(new UnsubAck(unsubscribeCommand.MessageId), unsubscribeCommand.TcpConnection);
+        await Console.Out.WriteLineAsync("Topic is unsubscribed");
     }
 
     public void RemoveTcpConnection(DisconnectCommand disconnectCommand)
@@ -50,23 +53,28 @@ public class TopicManager : ITopicManager
         {
             RemoveTopicSubscribtion(topic.Name, disconnectCommand.TcpConnection);
         }
+        Console.WriteLine("Removed tcp connection");
     }
 
     public async Task PublishMessage(PublishCommand publishCommand)
     {
-        var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName) ?? throw new NotFoundException($"Cannot find topic witch name = {publishCommand.TopicName}");
-        foreach (var subscriber in topic.Subscribers)
+        var topic = Topics.SingleOrDefault(x => x.Name == publishCommand.TopicName);
+
+        foreach (var subscriber in topic?.Subscribers ?? [])
         {
             try
-            {
-                await _broker.SendResponse(publishCommand, subscriber);
+            {   if (subscriber != publishCommand.TcpConnection)
+                {
+                    await _broker.SendResponse(publishCommand, subscriber);
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error sending message: {ex}");
             }
         }
-        await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
+        await Console.Out.WriteLineAsync("Message has been published");
+        //await _broker.SendResponse(new PubAck(publishCommand.MessageId), publishCommand.TcpConnection);
     }
 
     private void RemoveTopicSubscribtion(string topicName, ITcpConnection tcpConnection)
